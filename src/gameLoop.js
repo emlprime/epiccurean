@@ -1,4 +1,5 @@
 import * as R from "ramda"
+import {getAICharacterIds} from './getIds'
 
 const isAttack = R.propEq('type', 'Attack')
 const isDefend = R.propEq('type', 'Defend')
@@ -30,6 +31,23 @@ const bringOutYourDead = R.pipe(
   R.keys
 )
 
+const reduceAIMove = ({state, currentTic}, id) => {
+  const hasNoMove = R.pathSatisfies(R.isNil, ["currentMove", id])
+  const alive = R.pipe(
+    bringOutYourDead,
+    R.includes(id),
+    R.not
+  )
+  const isReadyToMove = R.both(hasNoMove, alive)(state)
+
+  if (isReadyToMove) {
+    const currentState = R.assocPath(["currentMove", id], {type: "Attack", target: "abc123", amount: 5, plannedFor: 3+currentTic}, state)
+    return {state: currentState, currentTic}
+
+  }
+  return {state, currentTic}
+}
+
 
 const planAIMoves = R.curry((currentTic, state) => {
   //find all characters and filter for AI characters without a planned action
@@ -39,20 +57,9 @@ const planAIMoves = R.curry((currentTic, state) => {
   //return new state
   //don't do this if AI has 0 health
 
-  const hasNoMove = R.pathSatisfies(R.isNil, ["currentMove", "def456"])
-  const alive = R.pipe(
-    bringOutYourDead,
-    R.includes('def456'),
-    R.not
-  )
-  const isReadyToMove = R.both(hasNoMove, alive)(state)
-
-  if (isReadyToMove) {
-    const currentState = R.assocPath(["currentMove", "def456"], {type: "Attack", target: "abc123", amount: 5, plannedFor: 3+currentTic}, state)
-    return currentState
-
-  }
-  return state
+  const result =  R.reduce(reduceAIMove, {state, currentTic}, getAICharacterIds(state))
+  return R.prop('state', result)
+  
   
 })
 
@@ -84,8 +91,8 @@ function turn(state, action) {
 }
 
 const setMove = (state, action) => {
-  const {target, amount, currentTic}=action
-  return R.assocPath(["currentMove", "abc123"], {type: "Attack", target, amount, plannedFor: currentTic+5}, state)
+  const {target, actor, amount, currentTic}=action
+  return R.assocPath(["currentMove", actor], {type: "Attack", target, amount, plannedFor: currentTic+5}, state)
 }
 
 export default function moveReducer (state, action) {
