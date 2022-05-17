@@ -4,7 +4,7 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import { selectActionStatus } from './selectActionStatus'
 import ActionStatus from './ActionStatus';
 import styled from 'styled-components';
-import { GiBloodySword } from '@react-icons/all-files/gi/GiBloodySword';
+import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 
 const isCurrentMoveEmpty = (id) =>
   R.pipe(
@@ -33,7 +33,7 @@ export default function Character({ id, color, state, dispatch, currentTic }) {
           })
         }
       >
-        <GiBloodySword />
+        <GiBroadsword />
       </button>
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>
