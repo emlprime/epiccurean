@@ -6,16 +6,16 @@ import ActionStatus from './ActionStatus';
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 
-const isCurrentMoveEmpty = (id) =>
+const isPlannedMoveEmpty = (id) =>
   R.pipe(
-    R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['currentMove', id]),
+    R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['plannedMove', id]),
     R.not
   );
 
 export default function Character({ id, color, state, dispatch, currentTic }) {
   const health = R.path(['actors', id, 'health'], state);
   const name = R.path(['actors', id, 'name'], state);
-  const disabled = R.or(isCurrentMoveEmpty(id)(state), R.equals(health, 0));
+  const disabled = R.or(isPlannedMoveEmpty(id)(state), R.equals(health, 0));
   return (
     <Style>
       <div>{name}</div>

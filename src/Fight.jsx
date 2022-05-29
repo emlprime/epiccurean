@@ -19,7 +19,7 @@ const initialState = {
     rst654: { name: 'Eeeeevil', health: 100, type: 'AI' },
     abc567: { name: 'Randy', health: 100, type: 'AI' },
   },
-  currentMove: {},
+  plannedMove: {},
   effectiveMoves: [],
 };
 
