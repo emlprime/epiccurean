@@ -9,7 +9,7 @@ import Loop from './Loop';
 import moveReducer from './gameLoop';
 import { selectActionStatus } from './selectActionStatus';
 import { getCharacterIds, getAIIds } from './getIds';
-import { stateLens, getCurrentPlayer } from './actorSelectors'
+import { livingPlayersFromStateLens, availablePlayers, getCurrentPlayer } from './actorSelectors'
 
 const initialState = {
   actors: {
@@ -29,8 +29,7 @@ export default function Fight() {
   const [state, dispatch] = useReducer(moveReducer, initialState);
   // this triggers the reducer case of "take turn"
   const [currentTic, setCurrentTic] = useState(0);
-  const players = R.view(stateLens, state);
-  console.log(players)
+  const players = R.view(availablePlayers, state);
   const currentPlayer = getCurrentPlayer(players)
   const takeTurn = useCallback(
     (tic) => {

@@ -25,11 +25,27 @@ const getTurnOrder = R.sortWith([
 
 const isPlannedMoveEmpty = (id) =>
   R.pipe(R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['plannedMoves', id]));
-const isAlive = (id) =>
+const isAliveInState = (id) =>
   R.pathSatisfies(R.gt(R.__, 0), ['actors', id, 'health']);
+const isAlive = R.propSatisfies(R.gt(R.__, 0), 'health')
+const isUnplanned = R.propSatisfies(R.isNil, 'plannedMove')
 
-export const stateLens = R.lens(toArray, R.identity);
+const playersFromStateLens = R.lens(toArray, R.identity);
+const livingPlayers = R.lens(R.filter(isAlive), R.identity)
+const availablePlayers = R.lens(R.filter(isUnplanned), R.identity)
+
+export const livingPlayersFromStateLens = 
+R.pipe(
+  livingPlayers,
+  playersFromStateLens,
+)
+export const availablePlayers = 
+  R.compose(
+  livingPlayersFromStateLens,
+  availablePlayers
+)
+
 export const getCurrentPlayer = R.pipe(getTurnOrder, R.head);
 export const canPlanMove = (id, state) => {
-  return R.allPass([isPlannedMoveEmpty(id), isAlive(id)])(state);
+  return R.allPass([isPlannedMoveEmpty(id), isAliveInState(id)])(state);
 };
