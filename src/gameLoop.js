@@ -1,5 +1,5 @@
 import * as R from "ramda"
-import {getAICharacterIds} from './getIds'
+import {getAIIds} from './getIds'
 
 const isAttack = R.propEq('type', 'Attack')
 const isDefend = R.propEq('type', 'Defend')
@@ -10,8 +10,8 @@ const getDefends = getByType(isDefend)
 
 function handleAttack(state, action) {
   const {target, amount}=action
-  const current=R.path(["characters",target, 'health'], state)
-  return R.assocPath(["characters", target, 'health'], R.clamp(0, 100, current - amount), state)
+  const current=R.path(["actors",target, 'health'], state)
+  return R.assocPath(["actors", target, 'health'], R.clamp(0, 100, current - amount), state)
 }
 
 function reduceContext(state) {
@@ -26,7 +26,7 @@ const clearCurrentMove = (ticMoves) => R.over(R.lensProp('currentMove'), R.omit(
 
 const isDead = R.propEq('health', 0)
 const bringOutYourDead = R.pipe(
-  R.prop('characters'),
+  R.prop('actors'),
   R.filter(isDead),
   R.keys
 )
@@ -50,14 +50,14 @@ const reduceAIMove = ({state, currentTic}, id) => {
 
 
 const planAIMoves = R.curry((currentTic, state) => {
-  //find all characters and filter for AI characters without a planned action
+  //find all actors and filter for AI actors without a planned action
 
-  //hard code attack for all characters above
+  //hard code attack for all actors above
   //add back to the state
   //return new state
   //don't do this if AI has 0 health
 
-  const result =  R.reduce(reduceAIMove, {state, currentTic}, getAICharacterIds(state))
+  const result =  R.reduce(reduceAIMove, {state, currentTic}, getAIIds(state))
   return R.prop('state', result)
   
   
@@ -65,11 +65,11 @@ const planAIMoves = R.curry((currentTic, state) => {
 
 
 
-const disableDeadCharacters = (state) => {
-//filter for character names where character has 0 health
-//omit above character move from current moves
-const deadCharacters = bringOutYourDead(state)
-return R.over(R.lensProp('currentMove'), R.omit(deadCharacters))(state)
+const disableDeadActors = (state) => {
+//filter for actor names where actor has 0 health
+//omit above actor move from current moves
+const deadActors = bringOutYourDead(state)
+return R.over(R.lensProp('currentMove'), R.omit(deadActors))(state)
 }
 //}
 
@@ -79,7 +79,7 @@ const reduceMoves = R.curry((ticMoves, currentTic, state) => R.pipe(
   clearCurrentMove(ticMoves),
   reduceContext,
   clearEffectiveMoves,
-  disableDeadCharacters,
+  disableDeadActors,
   planAIMoves(currentTic),
 )(state))
 

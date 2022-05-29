@@ -6,8 +6,8 @@ import ActionStatus from './ActionStatus'
 import {selectActionStatus} from './selectActionStatus'
 
 export default function AI({ id, color, state, currentTic, children }) {
-  const health = R.path(['characters', id, 'health'], state);
-  const name = R.path(['characters', id, 'name'], state);
+  const health = R.path(['actors', id, 'health'], state);
+  const name = R.path(['actors', id, 'name'], state);
 
   return (
     <Style>

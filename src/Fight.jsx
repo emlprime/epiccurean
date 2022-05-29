@@ -8,10 +8,10 @@ import AI from './AI';
 import Loop from './Loop';
 import moveReducer from './gameLoop';
 import { selectActionStatus } from './selectActionStatus';
-import { getPlayerCharacterIds, getAICharacterIds } from './getIds';
+import { getCharacterIds, getAIIds } from './getIds';
 
 const initialState = {
-  characters: {
+  actors: {
     abc123: { name: 'Bob', health: 100, type: 'Character' },
     def456: { name: 'Frank', health: 100, type: 'AI' },
     ghi789: { name: 'Doggo', health: 100, type: 'Character' },
@@ -51,7 +51,7 @@ export default function Fight() {
                 currentTic={currentTic}
               />
             ),
-            getPlayerCharacterIds(initialState)
+            getCharacterIds(initialState)
           )}
         </Profile>
         <Profile className="right">
@@ -66,7 +66,7 @@ export default function Fight() {
                   {needTarget && <button>target</button>}
               </AI>
             ),
-            getAICharacterIds(initialState)
+            getAIIds(initialState)
           )}
         </Profile>
       </section>

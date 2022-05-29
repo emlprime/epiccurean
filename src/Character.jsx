@@ -13,8 +13,8 @@ const isCurrentMoveEmpty = (id) =>
   );
 
 export default function Character({ id, color, state, dispatch, currentTic }) {
-  const health = R.path(['characters', id, 'health'], state);
-  const name = R.path(['characters', id, 'name'], state);
+  const health = R.path(['actors', id, 'health'], state);
+  const name = R.path(['actors', id, 'name'], state);
   const disabled = R.or(isCurrentMoveEmpty(id)(state), R.equals(health, 0));
   return (
     <Style>
