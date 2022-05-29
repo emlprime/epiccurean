@@ -23,6 +23,8 @@ const initialState = {
   effectiveMoves: [],
 };
 
+
+
 export default function Fight() {
   const [state, dispatch] = useReducer(moveReducer, initialState);
   // this triggers the reducer case of "take turn"

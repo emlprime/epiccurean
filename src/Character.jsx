@@ -10,12 +10,10 @@ const isPlannedMoveEmpty = (id) =>
   R.pipe(
     R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['plannedMove', id]),
   );
-
 const isAlive = (id) => R.pathSatisfies(R.gt(R.__,0),['actors', id, "health"])
-
-
+const hasTarget = R.F
 const canPlanMove = (id, state) => {
-  return R.allPass([isPlannedMoveEmpty(id), isAlive(id)])(state);
+  return R.allPass([isPlannedMoveEmpty(id), isAlive(id), hasTarget])(state);
 }
 
 export default function Character({ id, color, state, dispatch, currentTic }) {

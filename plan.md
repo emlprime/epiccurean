@@ -4,13 +4,13 @@ DONE - game loop schedules attacks from enemies
 DONE - attack button becomes available when there is no current action for a character
 DONE - show health of2 character as health bar
 DONEish - show progress bar toward executing action
-- support more than one character
+DONE - support more than one character
 DONE - disable player characters when health is 0
 DONE - disable AI characters when health is 0
 - show icon on progress bar indicating type of action
 - make sound effect when action executes
-- selector for attack action removes dead characters
-- support more than one enemy
+DONE - selector for attack action removes dead characters
+DONE - support more than one enemy
 - selector for attack sorts characters by criteria
 - add weapon to attack context
 - add armor to attack context
@@ -32,3 +32,24 @@ DONE - disable AI characters when health is 0
 - enemy inventory
 - looting
 - healing
+
+
+whose line is it anyway?
+Are you a character?
+Are you alive?
+Are you available?
+List of objects(actors) whose turn it could be
+
+least health - because desperation makes you act with less consideration
+speed - if you fast, you faster
+position - closer person has to choose quickly
+
+
+
+
+
+
+
+
+
+
