@@ -21,17 +21,16 @@ const initialState = {
     abc567: { name: 'Randy', health: 100, speed: 10, type: 'AI' },
   },
   characterRoster: ['abc123','ghi789','xyz987'],
-  plannedMove: {},
+  plannedMoves: {},
   effectiveMoves: [],
 };
-
-
 
 export default function Fight() {
   const [state, dispatch] = useReducer(moveReducer, initialState);
   // this triggers the reducer case of "take turn"
   const [currentTic, setCurrentTic] = useState(0);
   const players = R.view(stateLens, state);
+  console.log(players)
   const currentPlayer = getCurrentPlayer(players)
   const takeTurn = useCallback(
     (tic) => {

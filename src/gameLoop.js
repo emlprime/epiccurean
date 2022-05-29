@@ -22,7 +22,7 @@ const addEffectiveMove = (ticMoves) =>   R.over(R.lensProp('effectiveMoves'), R.
 
 const clearEffectiveMoves = R.assoc('effectiveMoves', [])
 
-const clearPlannedMove = (ticMoves) => R.over(R.lensProp('plannedMove'), R.omit(R.keys(ticMoves)))
+const clearPlannedMoves = (ticMoves) => R.over(R.lensProp('plannedMoves'), R.omit(R.keys(ticMoves)))
 
 const isDead = R.propEq('health', 0)
 const bringOutYourDead = R.pipe(
@@ -32,7 +32,7 @@ const bringOutYourDead = R.pipe(
 )
 
 const reduceAIMove = ({state, currentTic}, id) => {
-  const hasNoMove = R.pathSatisfies(R.isNil, ["plannedMove", id])
+  const hasNoMove = R.pathSatisfies(R.isNil, ["plannedMoves", id])
   const alive = R.pipe(
     bringOutYourDead,
     R.includes(id),
@@ -41,7 +41,7 @@ const reduceAIMove = ({state, currentTic}, id) => {
   const isReadyToMove = R.both(hasNoMove, alive)(state)
 
   if (isReadyToMove) {
-    const currentState = R.assocPath(["plannedMove", id], {type: "Attack", target: "abc123", amount: 5, plannedFor: 3+currentTic}, state)
+    const currentState = R.assocPath(["plannedMoves", id], {type: "Attack", target: "abc123", amount: 5, plannedFor: 3+currentTic}, state)
     return {state: currentState, currentTic}
 
   }
@@ -69,14 +69,14 @@ const disableDeadActors = (state) => {
 //filter for actor names where actor has 0 health
 //omit above actor move from current moves
 const deadActors = bringOutYourDead(state)
-return R.over(R.lensProp('plannedMove'), R.omit(deadActors))(state)
+return R.over(R.lensProp('plannedMoves'), R.omit(deadActors))(state)
 }
 //}
 
 
 const reduceMoves = R.curry((ticMoves, currentTic, state) => R.pipe(
   addEffectiveMove(ticMoves),
-  clearPlannedMove(ticMoves),
+  clearPlannedMoves(ticMoves),
   reduceContext,
   clearEffectiveMoves,
   disableDeadActors,
@@ -86,13 +86,13 @@ const reduceMoves = R.curry((ticMoves, currentTic, state) => R.pipe(
 // turn evaluates each tic for planned actions and executes them on time
 function turn(state, action) {
   const {tic: currentTic} = action
-  const ticMoves = R.filter(R.propSatisfies(tic => tic === currentTic, "plannedFor"), R.prop("plannedMove",state))
+  const ticMoves = R.filter(R.propSatisfies(tic => tic === currentTic, "plannedFor"), R.prop("plannedMoves",state))
   return reduceMoves(ticMoves, currentTic, state)
 }
 
 const setMove = (state, action) => {
   const {target, actor, amount, currentTic}=action
-  return R.assocPath(["plannedMove", actor], {type: "Attack", target, amount, plannedFor: currentTic+5}, state)
+  return R.assocPath(["plannedMoves", actor], {type: "Attack", target, amount, plannedFor: currentTic+5}, state)
 }
 
 export default function moveReducer (state, action) {
