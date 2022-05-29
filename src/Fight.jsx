@@ -13,7 +13,7 @@ import { getPlayerCharacterIds, getAICharacterIds } from './getIds';
 const initialState = {
   characters: {
     abc123: { name: 'Bob', health: 100, type: 'Character' },
-    def456: { name: 'Chard', health: 100, type: 'AI' },
+    def456: { name: 'Frank', health: 100, type: 'AI' },
     ghi789: { name: 'Doggo', health: 100, type: 'Character' },
     xyz987: { name: 'Jojo', health: 100, type: 'Character' },
     rst654: { name: 'Eeeeevil', health: 100, type: 'AI' },
