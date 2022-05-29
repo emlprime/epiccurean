@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import ActionStatus from './ActionStatus'
 import {selectActionStatus} from './selectActionStatus'
 
-export default function AI({ id, color, state, currentTic }) {
+export default function AI({ id, color, state, currentTic, children }) {
   const health = R.path(['characters', id, 'health'], state);
   const name = R.path(['characters', id, 'name'], state);
 
@@ -13,6 +13,7 @@ export default function AI({ id, color, state, currentTic }) {
     <Style>
       <div>{name}</div>
       <ProgressBar bgColor={color} completed={health} />
+      {children}
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>    
   );

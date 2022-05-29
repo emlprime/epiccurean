@@ -34,6 +34,7 @@ export default function Fight() {
     },
     [dispatch]
   );
+  const needTarget = true
   return (
     <Style>
       <Loop callback={takeTurn} />
@@ -61,8 +62,9 @@ export default function Fight() {
                 id={id}
                 color="red"
                 state={state}
-                currentTic={currentTic}
-              />
+                currentTic={currentTic}>
+                  {needTarget && <button>target</button>}
+              </AI>
             ),
             getAICharacterIds(initialState)
           )}
