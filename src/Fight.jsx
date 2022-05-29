@@ -9,6 +9,7 @@ import Loop from './Loop';
 import moveReducer from './gameLoop';
 import { selectActionStatus } from './selectActionStatus';
 import { getCharacterIds, getAIIds } from './getIds';
+import { stateLens, getCurrentPlayer } from './actorSelectors'
 
 const initialState = {
   actors: {
@@ -24,32 +25,13 @@ const initialState = {
   effectiveMoves: [],
 };
 
-const getCharacterFromState = R.curry((actors, key, i) => R.pipe(
-  R.prop(R.__, actors),
-  R.assoc('position', i),
-  R.assoc('id', key),
-)(key));
 
-const mapWithIndex = R.addIndex(R.map);
-const toArray = ({actors, characterRoster}) => {
-  return mapWithIndex(getCharacterFromState(actors), characterRoster)};
-const stateLens = R.lens(toArray, R.identity);
 
 export default function Fight() {
   const [state, dispatch] = useReducer(moveReducer, initialState);
   // this triggers the reducer case of "take turn"
   const [currentTic, setCurrentTic] = useState(0);
   const players = R.view(stateLens, state);
-  const getTurnOrder = 
-  R.sortWith([R.ascend(R.prop('health')),
-  R.descend(R.prop('speed')), 
-  R.ascend(R.prop('position'))]
-  );
-  const getCurrentPlayer = 
-  R.pipe(
-    getTurnOrder, 
-    R.head
-  );
   const currentPlayer = getCurrentPlayer(players)
   const takeTurn = useCallback(
     (tic) => {

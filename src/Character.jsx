@@ -3,23 +3,14 @@ import * as R from 'ramda';
 import ProgressBar from '@ramonak/react-progress-bar';
 import { selectActionStatus } from './selectActionStatus'
 import ActionStatus from './ActionStatus';
+import { canPlanMove } from './actorSelectors'
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
-
-const isPlannedMoveEmpty = (id) =>
-  R.pipe(
-    R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['plannedMove', id]),
-  );
-const isAlive = (id) => R.pathSatisfies(R.gt(R.__,0),['actors', id, "health"])
-const canPlanMove = (id, state) => {
-  return R.allPass([isPlannedMoveEmpty(id), isAlive(id)])(state);
-}
 
 export default function Character({ id, color, state, dispatch, isCurrent, currentTic }) {
   const health = R.path(['actors', id, 'health'], state);
   const name = R.path(['actors', id, 'name'], state);
-  const disabled = !canPlanMove(id, state)
-  console.log(isCurrent)
+  const disabled = !canPlanMove(id, state) || !isCurrent
   return (
     <Style>
       <div>{name}</div>
