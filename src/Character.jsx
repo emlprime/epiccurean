@@ -11,15 +11,15 @@ const isPlannedMoveEmpty = (id) =>
     R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['plannedMove', id]),
   );
 const isAlive = (id) => R.pathSatisfies(R.gt(R.__,0),['actors', id, "health"])
-const hasTarget = R.F
 const canPlanMove = (id, state) => {
-  return R.allPass([isPlannedMoveEmpty(id), isAlive(id), hasTarget])(state);
+  return R.allPass([isPlannedMoveEmpty(id), isAlive(id)])(state);
 }
 
-export default function Character({ id, color, state, dispatch, currentTic }) {
+export default function Character({ id, color, state, dispatch, isCurrent, currentTic }) {
   const health = R.path(['actors', id, 'health'], state);
   const name = R.path(['actors', id, 'name'], state);
   const disabled = !canPlanMove(id, state)
+  console.log(isCurrent)
   return (
     <Style>
       <div>{name}</div>
