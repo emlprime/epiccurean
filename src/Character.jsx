@@ -9,13 +9,19 @@ import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 const isPlannedMoveEmpty = (id) =>
   R.pipe(
     R.pathSatisfies(R.and(R.isEmpty, R.isNil), ['plannedMove', id]),
-    R.not
   );
+
+const isAlive = (id) => R.pathSatisfies(R.gt(R.__,0),['actors', id, "health"])
+
+
+const canPlanMove = (id, state) => {
+  return R.allPass([isPlannedMoveEmpty(id), isAlive(id)])(state);
+}
 
 export default function Character({ id, color, state, dispatch, currentTic }) {
   const health = R.path(['actors', id, 'health'], state);
   const name = R.path(['actors', id, 'name'], state);
-  const disabled = R.or(isPlannedMoveEmpty(id)(state), R.equals(health, 0));
+  const disabled = !canPlanMove(id, state)
   return (
     <Style>
       <div>{name}</div>
