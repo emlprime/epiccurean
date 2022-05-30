@@ -1,29 +1,38 @@
 import React from 'react';
 import * as R from 'ramda';
 import ProgressBar from '@ramonak/react-progress-bar';
-import { selectActionStatus } from './selectActionStatus'
+import { selectActionStatus } from './selectActionStatus';
 import ActionStatus from './ActionStatus';
-import { canPlanMove } from './actorSelectors'
+import { canPlanMove } from './actorSelectors';
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
 
-export default function Character({ id, color, state, dispatch, isCurrent, currentTic }) {
+export default function Character({
+  id,
+  color,
+  state,
+  dispatch,
+  isCurrent,
+  currentTic,
+}) {
   const health = R.path(['actors', id, 'health'], state);
   const name = R.path(['actors', id, 'name'], state);
-  const disabled = !canPlanMove(id, state) || !isCurrent
+  const target = R.path(['actors', id, 'target'], state)
+  const disableTarget = !canPlanMove(id, state) || !isCurrent;
+  const disableAttack = !canPlanMove(id, state) || !isCurrent || R.isNil(target);
   return (
     <Style>
       <div>{name}</div>
       <ProgressBar bgColor={color} completed={health} />
       <button
         title="Leeerooooy Jenkins!!!"
-        disabled={disabled}
+        disabled={disableAttack}
         onClick={() =>
           dispatch({
             type: 'Attack',
             actor: id,
-            target: 'def456',
+            target: target,
             amount: 10,
             currentTic,
           })
@@ -31,8 +40,17 @@ export default function Character({ id, color, state, dispatch, isCurrent, curre
       >
         <GiBroadsword />
       </button>
-      <button>
-        < GiTargeting />
+      <button
+        title="Set Target"
+        disabled={disableTarget}
+        onClick={() =>
+          dispatch({
+            type: 'setTarget',
+            actor: id
+          })
+        }
+      >
+        <GiTargeting />
       </button>
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>

@@ -95,10 +95,16 @@ const setMove = (state, action) => {
   return R.assocPath(["plannedMoves", actor], {type: "Attack", target, amount, plannedFor: currentTic+5}, state)
 }
 
+const setTarget = (state, action) => {
+  const {actor} = action
+  return R.assocPath(['actors', actor, 'target'], 'rst654')(state)
+}
+
 export default function moveReducer (state, action) {
   const {type} = action
   switch(type) {
   case "Attack": return setMove(state, action)
+  case "setTarget": return setTarget(state, action)
  //   case "Heal": return handleHeal(state, action)
  //  calls turn on a tic - action contains type and tic, state is updated each iteration
     case "Take Turn": return turn(state, action)
