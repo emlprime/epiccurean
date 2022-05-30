@@ -16,11 +16,10 @@ export default function Character({
   isCurrent,
   currentTic,
 }) {
-  const health = R.path(['actors', id, 'health'], state);
-  const name = R.path(['actors', id, 'name'], state);
-  const target = R.path(['actors', id, 'target'], state)
+  const actor = R.path(['actors', id], state)
+  const {health, name, target} = actor
   const disableTarget = !canPlanMove(id, state) || !isCurrent;
-  const disableAttack = !canPlanMove(id, state) || !isCurrent || R.isNil(target);
+  const disableAttack = disableTarget || R.isNil(target);
   return (
     <Style>
       <div>{name}</div>
