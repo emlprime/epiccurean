@@ -10,6 +10,8 @@ import moveReducer from './gameLoop';
 import { selectActionStatus } from './selectActionStatus';
 import { getCharacterIds, getAIIds } from './getIds';
 import { livingPlayersFromStateLens, availablePlayers, getCurrentPlayer } from './actorSelectors'
+import { GiHumanTarget } from '@react-icons/all-files/gi/GiHumanTarget'
+
 
 const initialState = {
   actors: {
@@ -68,7 +70,7 @@ export default function Fight() {
                 color="red"
                 state={state}
                 currentTic={currentTic}>
-                  {needTarget && <button>target</button>}
+                  {needTarget && <button><GiHumanTarget /></button>}
               </AI>
             ),
             getAIIds(initialState)

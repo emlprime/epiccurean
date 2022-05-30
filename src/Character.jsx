@@ -6,6 +6,7 @@ import ActionStatus from './ActionStatus';
 import { canPlanMove } from './actorSelectors'
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
+import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
 
 export default function Character({ id, color, state, dispatch, isCurrent, currentTic }) {
   const health = R.path(['actors', id, 'health'], state);
@@ -29,6 +30,9 @@ export default function Character({ id, color, state, dispatch, isCurrent, curre
         }
       >
         <GiBroadsword />
+      </button>
+      <button>
+        < GiTargeting />
       </button>
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>
