@@ -40,7 +40,8 @@ export default function Fight() {
     },
     [dispatch]
   );
-  const needTarget = true
+  const currentPlayerId = R.prop('id', currentPlayer)
+  const needTarget = R.path(['actors', currentPlayerId, 'isTargeting'], state)
   return (
     <Style>
       <Loop callback={takeTurn} />
@@ -70,7 +71,15 @@ export default function Fight() {
                 color="red"
                 state={state}
                 currentTic={currentTic}>
-                  {needTarget && <button><GiHumanTarget /></button>}
+                  {needTarget && <button
+                  onClick={() => 
+                    dispatch({
+                      target: id,
+                      actor: currentPlayerId,
+                      type: 'setTarget'
+                    })
+                  }
+                  ><GiHumanTarget /></button>}
               </AI>
             ),
             getAIIds(initialState)

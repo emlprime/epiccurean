@@ -17,13 +17,25 @@ export default function Character({
   currentTic,
 }) {
   const actor = R.path(['actors', id], state)
-  const {health, name, target} = actor
-  const disableTarget = !canPlanMove(id, state) || !isCurrent;
+  const {health, name, target, isTargeting} = actor
+  const disableTarget = !canPlanMove(id, state) || !isCurrent || isTargeting;
   const disableAttack = disableTarget || R.isNil(target);
   return (
     <Style>
       <div>{name}</div>
       <ProgressBar bgColor={color} completed={health} />
+      <button
+        title="Set Target"
+        disabled={disableTarget}
+        onClick={() =>
+          dispatch({
+            type: 'beginTargeting',
+            actor: id
+          })
+        }
+      >
+        <GiTargeting />
+      </button>
       <button
         title="Leeerooooy Jenkins!!!"
         disabled={disableAttack}
@@ -38,18 +50,6 @@ export default function Character({
         }
       >
         <GiBroadsword />
-      </button>
-      <button
-        title="Set Target"
-        disabled={disableTarget}
-        onClick={() =>
-          dispatch({
-            type: 'setTarget',
-            actor: id
-          })
-        }
-      >
-        <GiTargeting />
       </button>
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>

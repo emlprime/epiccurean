@@ -96,14 +96,25 @@ const setMove = (state, action) => {
 }
 
 const setTarget = (state, action) => {
+  const {target, actor} = action
+  console.log()
+  return R.pipe(
+    R.assocPath(['actors', actor, 'target'], target),
+    R.dissocPath(['actors', actor, 'isTargeting'])
+    )
+    (state)
+}
+
+const beginTargeting = (state, action) => {
   const {actor} = action
-  return R.assocPath(['actors', actor, 'target'], 'rst654')(state)
+  return R.assocPath(["actors", actor, "isTargeting"], true, state)
 }
 
 export default function moveReducer (state, action) {
   const {type} = action
   switch(type) {
   case "Attack": return setMove(state, action)
+  case "beginTargeting": return beginTargeting(state, action)
   case "setTarget": return setTarget(state, action)
  //   case "Heal": return handleHeal(state, action)
  //  calls turn on a tic - action contains type and tic, state is updated each iteration
