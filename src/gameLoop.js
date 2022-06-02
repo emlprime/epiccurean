@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { getAIIds } from './getIds';
+import { getAIIds, getCharacterIds } from './getIds';
 
 const isAttack = R.propEq('type', 'Attack');
 const isDefend = R.propEq('type', 'Defend');
@@ -43,9 +43,17 @@ const knownAttacks = {
    
 };
 
+const firstLivingPerson = (state) => {
+  const {actors, characterRoster} = state
+  const deadTargets = bringOutYourDead(state)
+  const livingTargets = R.without(deadTargets, characterRoster)
+  return livingTargets[0]
+}
+
 const getAIAction = (state, currentTic, id) => {
-  const {type, amount, planOffset} = R.prop('stabbity', knownAttacks)
-  const target = 'abc123';
+  const {type, amount, planOffset} = R.prop('scrappin', knownAttacks)
+  const target = firstLivingPerson(state);
+  console.log(target)
   const plannedFor = planOffset + currentTic;
 
   return { type, target, amount, plannedFor };
