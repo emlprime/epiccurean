@@ -53,7 +53,6 @@ const firstLivingPerson = (state) => {
 const getAIAction = (state, currentTic, id) => {
   const {type, amount, planOffset} = R.prop('scrappin', knownAttacks)
   const target = firstLivingPerson(state);
-  console.log(target)
   const plannedFor = planOffset + currentTic;
 
   return { type, target, amount, plannedFor };
