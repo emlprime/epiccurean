@@ -43,8 +43,9 @@ const knownAttacks = {
    
 };
 
+//TODO can be refactored
 const firstLivingPerson = (state) => {
-  const {actors, characterRoster} = state
+  const {characterRoster} = state
   const deadTargets = bringOutYourDead(state)
   const livingTargets = R.without(deadTargets, characterRoster)
   return livingTargets[0]
