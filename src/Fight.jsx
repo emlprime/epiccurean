@@ -22,7 +22,6 @@ const initialState = {
       name: 'Bob',
       health: 100,
       speed: 15,
-      currentAction: 'stabby',
       type: 'Character',
     },
     def456: {
@@ -36,14 +35,12 @@ const initialState = {
       name: 'Doggo',
       health: 100,
       speed: 20,
-      currentAction: 'scrappin',
       type: 'Character',
     },
     xyz987: {
       name: 'Jojo',
       health: 100,
       speed: 10,
-      currentAction: 'stabby',
       type: 'Character',
     },
     rst654: {

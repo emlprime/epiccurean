@@ -2,32 +2,40 @@ import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
 
 const isAttack = R.propEq('type', 'Attack');
-const isDefend = R.propEq('type', 'Defend');
+const isHeal = R.propEq('type', 'Heal');
 
 const getByType = (typePred) => R.pipe(R.values, R.filter(typePred));
 const getAttacks = getByType(isAttack);
-const getDefends = getByType(isDefend);
+const getHeals = getByType(isHeal);
 
-function handleAttack(state, action) {
-  const { target, amount } = action;
+const handleAttack = (state, action) => {
+  const { target, amount } = action
   const current = R.path(['actors', target, 'health'], state);
-  console.log(state)
   return R.assocPath(
     ['actors', target, 'health'],
     R.clamp(0, 100, current - amount),
     state
   );
+};
+
+const handleHeal = (state, action) => {
+  const { target, amount } = action;
+  const current = R.path(['actors', target, 'health'], state);
+  return R.assocPath(['actors', target, 'health'], R.clamp(0, 100, current + amount), state
+  )
 }
 
-function reduceContext(state) {
-  return R.reduce(
-    handleAttack,
-    state,
-    getAttacks(R.prop('effectiveMoves', state))
+const reduceAttack = (state) =>
+  R.reduce(handleAttack, state, getAttacks(R.prop('effectiveMoves', state)));
+
+const reduceHeal = (state) => R.reduce(handleHeal, state, getHeals(R.prop('effectiveMoves', state)));
+
+const reduceContext = R.pipe(
+  reduceAttack,
+  reduceHeal
   );
-}
 
-const addEffectiveMove = (ticMoves) => 
+const addEffectiveMove = (ticMoves) =>
   R.over(R.lensProp('effectiveMoves'), R.concat(R.values(ticMoves)));
 
 const clearEffectiveMoves = R.assoc('effectiveMoves', []);
@@ -38,31 +46,31 @@ const clearPlannedMoves = (ticMoves) =>
 const isDead = R.propEq('health', 0);
 const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
-const knownActions = { 
+const knownActions = {
   scratch: { type: 'Attack', amount: 4, planOffset: 1 },
   scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
-  stabby: { type: 'Attack', amount: 15, planOffset: 5 }
-
+  stabby: { type: 'Attack', amount: 15, planOffset: 5 },
+  lifegiver: { type: 'Heal', amount: 50, planOffset: 10 },
 };
 
 //TODO can be refactored
 const firstLivingCharacter = (state) => {
-  const {characterRoster} = state
-  const deadTargets = bringOutYourDead(state)
-  const livingTargets = R.without(deadTargets, characterRoster)
-  return livingTargets[0]
-}
+  const { characterRoster } = state;
+  const deadTargets = bringOutYourDead(state);
+  const livingTargets = R.without(deadTargets, characterRoster);
+  return livingTargets[0];
+};
 
 const planAction = (state, currentTic, id) => {
-  const currentAction = R.path(['actors', id, 'currentAction'], state)
-  const {type, amount, planOffset} = R.prop(currentAction, knownActions)
+  const currentAction = R.path(['actors', id, 'currentAction'], state);
+  const { type, amount, planOffset } = R.prop(currentAction, knownActions);
   const plannedFor = planOffset + currentTic;
-  return {type, amount, plannedFor}
-}
+  return { type, amount, plannedFor };
+};
 
 const getAIAction = (state, currentTic, id) => {
   const target = firstLivingCharacter(state);
-  const action =  planAction(state, currentTic, id)
+  const action = planAction(state, currentTic, id);
   return R.assoc('target', target, action);
 };
 
@@ -121,18 +129,20 @@ function turn(state, action) {
 }
 
 const setMove = (state, action) => {
-  const { target, actor, currentTic } = action;
-  const plannedAction = planAction(state, currentTic, actor)
-  return R.assocPath(
-    ['plannedMoves', actor],
-    R.assoc('target', target, plannedAction),
-    state
-  );
+  const { actor, currentAction } = action;
+  return R.assocPath(['actors', actor, 'currentAction'], currentAction, state);
+};
+
+const setPlannedMove = (state, action) => {
+  const { actor, currentTic } = action;
+  const actionTemplate = planAction(state, currentTic, actor);
+  const target = R.path(['actors', actor, 'target'], state);
+  const plannedMove = R.assoc('target', target, actionTemplate);
+  return R.assocPath(['plannedMoves', actor], plannedMove, state);
 };
 
 const setTarget = (state, action) => {
   const { target, actor } = action;
-  console.log();
   return R.pipe(
     R.assocPath(['actors', actor, 'target'], target),
     R.dissocPath(['actors', actor, 'isTargeting'])
@@ -147,7 +157,9 @@ const beginTargeting = (state, action) => {
 export default function moveReducer(state, action) {
   const { type } = action;
   switch (type) {
-    case 'Attack':
+    case 'setPlannedMove':
+      return setPlannedMove(state, action);
+    case 'setMove':
       return setMove(state, action);
     case 'beginTargeting':
       return beginTargeting(state, action);

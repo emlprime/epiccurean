@@ -7,6 +7,8 @@ import { canPlanMove } from './actorSelectors';
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
+import { GiHealthPotion } from '@react-icons/all-files/gi/GiHealthPotion';
+
 
 export default function Character({
   id,
@@ -41,7 +43,8 @@ export default function Character({
         disabled={disableAttack}
         onClick={() =>
           dispatch({
-            type: 'Attack',
+            type: 'setMove',
+            currentAction: 'stabby',
             actor: id,
             target: target,
             currentTic,
@@ -49,6 +52,34 @@ export default function Character({
         }
       >
         <GiBroadsword />
+      </button>
+      <button
+        title="MEDIC!!!!"
+        disabled={disableAttack}
+        onClick={() =>
+          dispatch({
+            type: 'setMove',
+            currentAction: 'lifegiver',
+            actor: id,
+            target: target,
+            currentTic,
+          })
+        }
+      >
+        <GiHealthPotion />
+      </button>
+      <button
+        title="done"
+        disabled={disableAttack}
+        onClick={() =>
+          dispatch({
+            type: 'setPlannedMove',
+            actor: id,
+            currentTic,
+          })
+        }
+      >
+        done
       </button>
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>
