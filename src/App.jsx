@@ -5,8 +5,10 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import './style.css';
 import Fight from './Fight';
+import { getCurrentUser } from './CurrentUser'
 
 // Configure Firebase.
+//TODO remove api key from github
 const config = {
   apiKey: 'AIzaSyBtTdVWE1AZ1JRENUUiAlzqlIXsaTVhCkc',
   authDomain: 'nidaviller-fe.firebaseapp.com',
@@ -26,6 +28,7 @@ const uiConfig = {
   },
 };
 
+
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
 
@@ -38,11 +41,11 @@ function App() {
       });
     return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
   }, []);
-
+  const currentUser = getCurrentUser(firebase)
   if (!isSignedIn) {
     return (
       <div>
-        <h1>My App</h1>
+        <h1>Epicurean Brawl</h1>
         <p>Please sign-in:</p>
         <StyledFirebaseAuth
           uiConfig={uiConfig}
@@ -53,10 +56,9 @@ function App() {
   }
   return (
     <div>
-      <h1>My App</h1>
+      <h1>Epicurean Brawl</h1>
       <p>
-        Welcome {firebase.auth().currentUser.displayName}! You are now
-        signed-in!
+        Welcome {currentUser.displayName}! Get ready to RUMBLE!
       </p>
       <button type="button" onClick={() => firebase.auth().signOut()}>
         Sign-out

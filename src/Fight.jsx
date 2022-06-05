@@ -9,20 +9,59 @@ import Loop from './Loop';
 import moveReducer from './gameLoop';
 import { selectActionStatus } from './selectActionStatus';
 import { getCharacterIds, getAIIds } from './getIds';
-import { livingPlayersFromStateLens, availablePlayers, getCurrentPlayer } from './actorSelectors'
-import { GiHumanTarget } from '@react-icons/all-files/gi/GiHumanTarget'
-
+import {
+  livingPlayersFromStateLens,
+  availablePlayers,
+  getCurrentPlayer,
+} from './actorSelectors';
+import { GiHumanTarget } from '@react-icons/all-files/gi/GiHumanTarget';
 
 const initialState = {
   actors: {
-    abc123: { name: 'Bob', health: 100, speed: 15, type: 'Character' },
-    def456: { name: 'Frank', health: 100, speed: 10, type: 'AI' },
-    ghi789: { name: 'Doggo', health: 100, speed: 20, type: 'Character' },
-    xyz987: { name: 'Jojo', health: 100, speed: 10, type: 'Character' },
-    rst654: { name: 'Eeeeevil', health: 100, speed: 10, type: 'AI' },
-    abc567: { name: 'Randy', health: 100, speed: 10, type: 'AI' },
+    abc123: {
+      name: 'Bob',
+      health: 100,
+      speed: 15,
+      currentAction: 'attack',
+      type: 'Character',
+    },
+    def456: {
+      name: 'Frank',
+      health: 100,
+      speed: 10,
+      currentAction: 'scrappin',
+      type: 'AI',
+    },
+    ghi789: {
+      name: 'Doggo',
+      health: 100,
+      speed: 20,
+      currentAction: 'attack',
+      type: 'Character',
+    },
+    xyz987: {
+      name: 'Jojo',
+      health: 100,
+      speed: 10,
+      currentAction: 'attack',
+      type: 'Character',
+    },
+    rst654: {
+      name: 'Eeeeevil',
+      health: 100,
+      speed: 10,
+      currentAction: 'stabbity',
+      type: 'AI',
+    },
+    abc567: {
+      name: 'Randy',
+      health: 100,
+      speed: 10,
+      currentAction: 'stabbity',
+      type: 'AI',
+    },
   },
-  characterRoster: ['abc123','ghi789','xyz987'],
+  characterRoster: ['abc123', 'ghi789', 'xyz987'],
   plannedMoves: {},
   effectiveMoves: [],
 };
@@ -32,7 +71,7 @@ export default function Fight() {
   // this triggers the reducer case of "take turn"
   const [currentTic, setCurrentTic] = useState(0);
   const players = R.view(availablePlayers, state);
-  const currentPlayer = getCurrentPlayer(players)
+  const currentPlayer = getCurrentPlayer(players);
   const takeTurn = useCallback(
     (tic) => {
       dispatch({ type: 'Take Turn', tic });
@@ -40,8 +79,8 @@ export default function Fight() {
     },
     [dispatch]
   );
-  const currentPlayerId = R.prop('id', currentPlayer)
-  const needTarget = R.path(['actors', currentPlayerId, 'isTargeting'], state)
+  const currentPlayerId = R.prop('id', currentPlayer);
+  const needTarget = R.path(['actors', currentPlayerId, 'isTargeting'], state);
   return (
     <Style>
       <Loop callback={takeTurn} />
@@ -52,7 +91,7 @@ export default function Fight() {
               <Character
                 key={id}
                 id={id}
-                isCurrent={R.equals(id, R.prop('id',currentPlayer))}
+                isCurrent={R.equals(id, R.prop('id', currentPlayer))}
                 color="blue"
                 state={state}
                 dispatch={dispatch}
@@ -70,16 +109,21 @@ export default function Fight() {
                 id={id}
                 color="red"
                 state={state}
-                currentTic={currentTic}>
-                  {needTarget && <button
-                  onClick={() => 
-                    dispatch({
-                      target: id,
-                      actor: currentPlayerId,
-                      type: 'setTarget'
-                    })
-                  }
-                  ><GiHumanTarget /></button>}
+                currentTic={currentTic}
+              >
+                {needTarget && (
+                  <button
+                    onClick={() =>
+                      dispatch({
+                        target: id,
+                        actor: currentPlayerId,
+                        type: 'setTarget',
+                      })
+                    }
+                  >
+                    <GiHumanTarget />
+                  </button>
+                )}
               </AI>
             ),
             getAIIds(initialState)

@@ -39,8 +39,8 @@ const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
 const knownAttacks = { 
   stabbity: { type: 'Attack', amount: 4, planOffset: 3 },
-  scrappin: { type: 'Attack', amount: 20, planOffset: 5 },
-   
+  scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
+  attack: { type: 'Attack', amount: 10, planOffset: 5 },
 };
 
 //TODO can be refactored
@@ -52,7 +52,9 @@ const firstLivingPerson = (state) => {
 }
 
 const getAIAction = (state, currentTic, id) => {
-  const {type, amount, planOffset} = R.prop('scrappin', knownAttacks)
+  const currentAction = R.path(['actors', id, 'currentAction'], state)
+  console.log(currentAction)
+  const {type, amount, planOffset} = R.prop(currentAction, knownAttacks)
   const target = firstLivingPerson(state);
   const plannedFor = planOffset + currentTic;
 
