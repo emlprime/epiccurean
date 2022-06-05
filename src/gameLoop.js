@@ -11,6 +11,7 @@ const getDefends = getByType(isDefend);
 function handleAttack(state, action) {
   const { target, amount } = action;
   const current = R.path(['actors', target, 'health'], state);
+  console.log(state)
   return R.assocPath(
     ['actors', target, 'health'],
     R.clamp(0, 100, current - amount),
@@ -26,7 +27,7 @@ function reduceContext(state) {
   );
 }
 
-const addEffectiveMove = (ticMoves) =>
+const addEffectiveMove = (ticMoves) => 
   R.over(R.lensProp('effectiveMoves'), R.concat(R.values(ticMoves)));
 
 const clearEffectiveMoves = R.assoc('effectiveMoves', []);
@@ -37,28 +38,32 @@ const clearPlannedMoves = (ticMoves) =>
 const isDead = R.propEq('health', 0);
 const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
-const knownAttacks = { 
-  stabbity: { type: 'Attack', amount: 4, planOffset: 3 },
+const knownActions = { 
+  scratch: { type: 'Attack', amount: 4, planOffset: 1 },
   scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
-  attack: { type: 'Attack', amount: 10, planOffset: 5 },
+  stabby: { type: 'Attack', amount: 15, planOffset: 5 }
+
 };
 
 //TODO can be refactored
-const firstLivingPerson = (state) => {
+const firstLivingCharacter = (state) => {
   const {characterRoster} = state
   const deadTargets = bringOutYourDead(state)
   const livingTargets = R.without(deadTargets, characterRoster)
   return livingTargets[0]
 }
 
-const getAIAction = (state, currentTic, id) => {
+const planAction = (state, currentTic, id) => {
   const currentAction = R.path(['actors', id, 'currentAction'], state)
-  console.log(currentAction)
-  const {type, amount, planOffset} = R.prop(currentAction, knownAttacks)
-  const target = firstLivingPerson(state);
+  const {type, amount, planOffset} = R.prop(currentAction, knownActions)
   const plannedFor = planOffset + currentTic;
+  return {type, amount, plannedFor}
+}
 
-  return { type, target, amount, plannedFor };
+const getAIAction = (state, currentTic, id) => {
+  const target = firstLivingCharacter(state);
+  const action =  planAction(state, currentTic, id)
+  return R.assoc('target', target, action);
 };
 
 const reduceAIMove = ({ state, currentTic }, id) => {
@@ -116,10 +121,11 @@ function turn(state, action) {
 }
 
 const setMove = (state, action) => {
-  const { target, actor, amount, currentTic } = action;
+  const { target, actor, currentTic } = action;
+  const plannedAction = planAction(state, currentTic, actor)
   return R.assocPath(
     ['plannedMoves', actor],
-    { type: 'Attack', target, amount, plannedFor: currentTic + 5 },
+    R.assoc('target', target, plannedAction),
     state
   );
 };

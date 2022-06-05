@@ -44,7 +44,6 @@ export default function Character({
             type: 'Attack',
             actor: id,
             target: target,
-            amount: 10,
             currentTic,
           })
         }
