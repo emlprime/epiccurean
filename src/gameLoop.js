@@ -9,24 +9,16 @@ const getAttacks = getByType(isAttack);
 const getHeals = getByType(isHeal);
 
 const healthLens = (id) => R.lensPath(['actors', id, 'health']);
+const handleHealthMutation =
+  (mutation) =>
+  (state, { target, amount }) => R.over(
+      healthLens(target),
+      R.pipe(mutation(R.__, amount), R.clamp(0, 100)),
+      state
+    );
 
-const handleAttack = (state, action) => {
-  const { target, amount } = action;
-  return R.over(
-    healthLens(target),
-    R.pipe(R.subtract(R.__, amount), R.clamp(0, 100)),
-    state
-  );
-};
-
-const handleHeal = (state, action) => {
-  const { target, amount } = action;
-  return R.over(
-    healthLens(target),
-    R.pipe(R.add(R.__, amount), R.clamp(0, 100)),
-    state
-  );
-};
+const handleAttack = handleHealthMutation(R.subtract);
+const handleHeal = handleHealthMutation(R.add);
 
 const reduceAttack = (state) =>
   R.reduce(handleAttack, state, getAttacks(R.prop('effectiveMoves', state)));

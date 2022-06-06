@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
 import { GiHealthPotion } from '@react-icons/all-files/gi/GiHealthPotion';
-
+import { GiPlayButton } from '@react-icons/all-files/gi/GiPlayButton';
 
 export default function Character({
   id,
@@ -20,9 +20,10 @@ export default function Character({
   children
 }) {
   const actor = R.path(['actors', id], state)
-  const {health, name, target, isTargeting} = actor
+  const {health, name, target, isTargeting, currentAction} = actor
   const disableTarget = !canPlanMove(id, state) || !isCurrent || isTargeting;
   const disableAttack = disableTarget || R.isNil(target);
+  const disableDone = disableAttack || R.isNil(currentAction)
   return (
     <Style>
       <div>{name}</div>
@@ -71,7 +72,7 @@ export default function Character({
       </button>
       <button
         title="done"
-        disabled={disableAttack}
+        disabled={disableDone}
         onClick={() =>
           dispatch({
             type: 'setPlannedMove',
@@ -80,7 +81,7 @@ export default function Character({
           })
         }
       >
-        done
+        <GiPlayButton />
       </button>
       {children}
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
