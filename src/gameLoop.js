@@ -8,32 +8,33 @@ const getByType = (typePred) => R.pipe(R.values, R.filter(typePred));
 const getAttacks = getByType(isAttack);
 const getHeals = getByType(isHeal);
 
+const healthLens = (id) => R.lensPath(['actors', id, 'health']);
+
 const handleAttack = (state, action) => {
-  const { target, amount } = action
-  const current = R.path(['actors', target, 'health'], state);
-  return R.assocPath(
-    ['actors', target, 'health'],
-    R.clamp(0, 100, current - amount),
+  const { target, amount } = action;
+  return R.over(
+    healthLens(target),
+    R.pipe(R.subtract(R.__, amount), R.clamp(0, 100)),
     state
   );
 };
 
 const handleHeal = (state, action) => {
   const { target, amount } = action;
-  const current = R.path(['actors', target, 'health'], state);
-  return R.assocPath(['actors', target, 'health'], R.clamp(0, 100, current + amount), state
-  )
-}
+  return R.over(
+    healthLens(target),
+    R.pipe(R.add(R.__, amount), R.clamp(0, 100)),
+    state
+  );
+};
 
 const reduceAttack = (state) =>
   R.reduce(handleAttack, state, getAttacks(R.prop('effectiveMoves', state)));
 
-const reduceHeal = (state) => R.reduce(handleHeal, state, getHeals(R.prop('effectiveMoves', state)));
+const reduceHeal = (state) =>
+  R.reduce(handleHeal, state, getHeals(R.prop('effectiveMoves', state)));
 
-const reduceContext = R.pipe(
-  reduceAttack,
-  reduceHeal
-  );
+const reduceContext = R.pipe(reduceAttack, reduceHeal);
 
 const addEffectiveMove = (ticMoves) =>
   R.over(R.lensProp('effectiveMoves'), R.concat(R.values(ticMoves)));
@@ -47,10 +48,10 @@ const isDead = R.propEq('health', 0);
 const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
 const knownActions = {
-  scratch: { type: 'Attack', amount: 4, planOffset: 1 },
+  scratch: { type: 'Attack', amount: 4, planOffset: 2 },
   scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
   stabby: { type: 'Attack', amount: 15, planOffset: 5 },
-  lifegiver: { type: 'Heal', amount: 50, planOffset: 10 },
+  lifegiver: { type: 'Heal', amount: 50, planOffset: 4 },
 };
 
 //TODO can be refactored
