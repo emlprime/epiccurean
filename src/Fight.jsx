@@ -93,10 +93,25 @@ export default function Fight() {
                 state={state}
                 dispatch={dispatch}
                 currentTic={currentTic}
-              />
+              >
+              {needTarget && (
+                <button
+                  onClick={() =>
+                    dispatch({
+                      target: id,
+                      actor: currentPlayerId,
+                      type: 'setTarget',
+                    })
+                  }
+                >
+                  <GiHumanTarget />
+                </button>
+              )}
+            </Character>
             ),
             getCharacterIds(initialState)
           )}
+          
         </Profile>
         <Profile className="right">
           {R.map(

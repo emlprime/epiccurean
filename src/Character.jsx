@@ -17,6 +17,7 @@ export default function Character({
   dispatch,
   isCurrent,
   currentTic,
+  children
 }) {
   const actor = R.path(['actors', id], state)
   const {health, name, target, isTargeting} = actor
@@ -81,6 +82,7 @@ export default function Character({
       >
         done
       </button>
+      {children}
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>
   );
