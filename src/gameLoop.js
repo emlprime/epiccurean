@@ -43,7 +43,8 @@ const knownActions = {
   scratch: { type: 'Attack', amount: 4, planOffset: 2 },
   scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
   stabby: { type: 'Attack', amount: 15, planOffset: 5 },
-  lifegiver: { type: 'Heal', amount: 50, planOffset: 4 },
+  lifegiver: { type: 'Heal', amount: 50, planOffset: 10 },
+  quickie: { type: 'Heal', amount: 5, planOffset: 2}
 };
 
 //TODO can be refactored
