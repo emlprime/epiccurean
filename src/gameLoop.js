@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
-import { addWounds } from './addWounds'
+import { addWounds } from './addWounds';
 
 const isAttack = R.propEq('type', 'Attack');
 const isHeal = R.propEq('type', 'Heal');
@@ -10,20 +10,30 @@ const getAttacks = getByType(isAttack);
 const getHeals = getByType(isHeal);
 
 const healthLens = (id) => R.lensPath(['actors', id, 'health']);
+const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
+
 const handleHealthMutation =
   (mutation) =>
-  (state, { target, amount }) => {
-    const db = R.prop('db', state)
-    const currentWounds = R.path(['actors', target, 'wounds'], state)
-    const wound = {location: 'head', type: "stab", amount, effect: "bleeding"}
-    const wounds = R.append(wound, currentWounds)
-    console.log(wounds)
-    addWounds(db, target, wounds)
-    return R.over(
-      healthLens(target),
-      R.pipe(mutation(R.__, amount), R.clamp(0, 100)),
-      state
-    );}
+  (state, action) => {
+    const {attackType, target, amount} = action
+    const db = R.prop('db', state);
+    const currentWounds = R.path(['actors', target, 'wounds'], state);
+    const wound = {
+      location: 'head',
+      attackType,
+      amount,
+      effect: 'bleeding',
+    };
+    const wounds = R.append(wound, currentWounds);
+    addWounds(db, target, wounds);
+    return R.pipe(
+      R.over(
+        healthLens(target),
+        R.pipe(mutation(R.__, amount), R.clamp(0, 100))
+      ),
+      R.over(woundsLens(target), R.pipe(R.defaultTo([]), R.append(wound)))
+    )(state);
+  };
 
 const handleAttack = handleHealthMutation(R.subtract);
 const handleHeal = handleHealthMutation(R.add);
@@ -71,7 +81,7 @@ const planAction = (state, currentTic, id) => {
     knownActions
   );
   const plannedFor = planOffset + currentTic;
-  return { type, amount, plannedFor };
+  return { attackType: currentAction, type, amount, plannedFor };
 };
 
 const getAIAction = (state, currentTic, id) => {
