@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
+import { addWounds } from './addWounds'
 
 const isAttack = R.propEq('type', 'Attack');
 const isHeal = R.propEq('type', 'Heal');
@@ -11,12 +12,18 @@ const getHeals = getByType(isHeal);
 const healthLens = (id) => R.lensPath(['actors', id, 'health']);
 const handleHealthMutation =
   (mutation) =>
-  (state, { target, amount }) =>
-    R.over(
+  (state, { target, amount }) => {
+    const db = R.prop('db', state)
+    const currentWounds = R.path(['actors', target, 'wounds'], state)
+    const wound = {location: 'head', type: "stab", amount, effect: "bleeding"}
+    const wounds = R.append(wound, currentWounds)
+    console.log(wounds)
+    addWounds(db, target, wounds)
+    return R.over(
       healthLens(target),
       R.pipe(mutation(R.__, amount), R.clamp(0, 100)),
       state
-    );
+    );}
 
 const handleAttack = handleHealthMutation(R.subtract);
 const handleHeal = handleHealthMutation(R.add);

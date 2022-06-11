@@ -16,18 +16,18 @@ import {
 } from "./actorSelectors";
 import { GiHumanTarget } from "@react-icons/all-files/gi/GiHumanTarget";
 import { watchActors } from "./getActors";
-
+import { addWounds } from "./addWounds";
 const initialState = {
   actors: {
     
   },
   characterRoster: [],
   plannedMoves: {},
-  effectiveMoves: [],
+  effectiveMoves: []
 };
 
 export default function Fight({ db }) {
-  const [state, dispatch] = useReducer(moveReducer, initialState);
+  const [state, dispatch] = useReducer(moveReducer, R.assoc("db", db, initialState));
   // this triggers the reducer case of "take turn"
   const onChangeActors = (actors) => {
     dispatch({ type: "UPDATE_ACTORS", actors });
@@ -45,6 +45,8 @@ export default function Fight({ db }) {
     },
     [dispatch]
   );
+
+
   const currentPlayerId = R.prop("id", currentPlayer);
   const needTarget = R.path(["actors", currentPlayerId, "isTargeting"], state);
   return (
