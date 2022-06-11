@@ -19,47 +19,9 @@ import { watchActors } from "./getActors";
 
 const initialState = {
   actors: {
-    abc123: {
-      name: "Bob",
-      health: 100,
-      speed: 15,
-      type: "Character",
-    },
-    def456: {
-      name: "Frank",
-      health: 100,
-      speed: 10,
-      currentAction: "scrappin",
-      type: "AI",
-    },
-    ghi789: {
-      name: "Doggo",
-      health: 100,
-      speed: 20,
-      type: "Character",
-    },
-    xyz987: {
-      name: "Jojo",
-      health: 100,
-      speed: 10,
-      type: "Character",
-    },
-    rst654: {
-      name: "Eeeeevil",
-      health: 100,
-      speed: 10,
-      currentAction: "scratch",
-      type: "AI",
-    },
-    abc567: {
-      name: "Randy",
-      health: 100,
-      speed: 10,
-      currentAction: "stabby",
-      type: "AI",
-    },
+    
   },
-  characterRoster: ["abc123", "ghi789", "xyz987"],
+  characterRoster: [],
   plannedMoves: {},
   effectiveMoves: [],
 };
@@ -116,7 +78,7 @@ export default function Fight({ db }) {
                 )}
               </Character>
             ),
-            getCharacterIds(initialState)
+            getCharacterIds(state)
           )}
         </Profile>
         <Profile className="right">
@@ -138,7 +100,7 @@ export default function Fight({ db }) {
                 )}
               </AI>
             ),
-            getAIIds(initialState)
+            getAIIds(state)
           )}
         </Profile>
       </section>
