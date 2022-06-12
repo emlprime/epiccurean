@@ -52,8 +52,10 @@ export default function Fight({ db }) {
   const needTarget = R.path(['actors', currentPlayerId, 'isTargeting'], state);
   return (
     <Style>
-      <button onClick={() => resetActors(db)}>Reset Actors</button>
-      <Loop callback={takeTurn} />
+      <header>
+        <Loop callback={takeTurn} />
+        <button onClick={() => resetActors(db)}>Reset Actors</button>
+      </header>
       <section>
         <Profile className="left">
           {R.map(
@@ -122,5 +124,8 @@ const Style = styled.div`
   section {
     display: flex;
     justify-content: space-between;
+  }
+  header {
+    display: flex;
   }
 `;
