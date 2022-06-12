@@ -1,4 +1,5 @@
 import * as R from "ramda";
+import {deriveHealth} from './deriveThings'
 
 const getCharacterFromState = R.curry((actors, plannedMoves, key, i) =>
   R.pipe(
@@ -14,16 +15,19 @@ const toArray = ({ actors, plannedMoves, characterRoster }) => {
   return mapWithIndex(getCharacterFromState(actors, plannedMoves), characterRoster);
 };
 
+const calculatedHealth = ({maxHealth, wounds}) => deriveHealth(maxHealth, wounds)
+
+
 const getTurnOrder = R.sortWith([
-  R.ascend(R.prop("health")),
+  R.ascend(calculatedHealth),
   R.descend(R.prop("speed")),
   R.ascend(R.prop("position")),
 ]);
 
 const isPlannedMoveEmpty = (id) =>
   R.pipe(R.pathSatisfies(R.and(R.isEmpty, R.isNil), ["plannedMoves", id]));
-const isAliveInState = (id) => R.pathSatisfies(R.gt(R.__, 0), ["actors", id, "health"]);
-const isAlive = R.propSatisfies(R.gt(R.__, 0), "health");
+const isAliveInState = (id) => R.pathSatisfies(R.equals('ALIVE'), ["actors", id, "status"]);
+const isAlive = R.propSatisfies(R.equals('ALIVE'), "status");
 const isUnplanned = R.propSatisfies(R.isNil, "plannedMove");
 
 const playersFromStateLens = R.lens(toArray, R.identity);

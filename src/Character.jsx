@@ -4,7 +4,7 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import { selectActionStatus } from './selectActionStatus';
 import ActionStatus from './ActionStatus';
 import { canPlanMove } from './actorSelectors';
-import { deriveHealth } from './deriveHealth';
+import { deriveHealth } from './deriveThings';
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';

@@ -16,7 +16,6 @@ import {
 } from "./actorSelectors";
 import { GiHumanTarget } from "@react-icons/all-files/gi/GiHumanTarget";
 import { watchActors } from "./getActors";
-import { addWounds } from "./addWounds";
 const initialState = {
   actors: {
     

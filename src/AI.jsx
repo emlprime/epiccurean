@@ -4,15 +4,15 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import styled from 'styled-components';
 import ActionStatus from './ActionStatus'
 import {selectActionStatus} from './selectActionStatus'
+import {deriveHealth} from './deriveThings'
 
 export default function AI({ id, color, state, currentTic, children }) {
-  const health = R.path(['actors', id, 'health'], state);
-  const name = R.path(['actors', id, 'name'], state);
-
+  const {name, maxHealth, wounds} = R.path(['actors', id], state)
+  const health = deriveHealth(maxHealth, wounds);
   return (
     <Style>
       <div>{name}</div>
-      <ProgressBar bgColor={color} completed={health} />
+      <ProgressBar bgColor={color} completed={health} maxCompleted={maxHealth} />
       {children}
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>    

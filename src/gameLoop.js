@@ -1,6 +1,8 @@
 import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
-import { addWounds } from './addWounds';
+import { updateActor } from './mutations';
+import { deriveHealth, deriveStatus } from './deriveThings'
+
 
 const isAttack = R.propEq('type', 'Attack');
 const isHeal = R.propEq('type', 'Heal');
@@ -9,31 +11,28 @@ const getByType = (typePred) => R.pipe(R.values, R.filter(typePred));
 const getAttacks = getByType(isAttack);
 const getHeals = getByType(isHeal);
 
-const healthLens = (id) => R.lensPath(['actors', id, 'health']);
 const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 
-const handleHealthMutation =
-  (mutation) =>
-  (state, action) => {
-    const {attackType, target, amount} = action
-    const db = R.prop('db', state);
-    const currentWounds = R.path(['actors', target, 'wounds'], state);
-    const wound = {
-      location: 'head',
-      attackType,
-      amount,
-      effect: 'bleeding',
-    };
-    const wounds = R.append(wound, currentWounds);
-    addWounds(db, target, wounds);
-    return R.pipe(
-      R.over(
-        healthLens(target),
-        R.pipe(mutation(R.__, amount), R.clamp(0, 100))
-      ),
-      R.over(woundsLens(target), R.pipe(R.defaultTo([]), R.append(wound)))
-    )(state);
+const handleHealthMutation = (mutation) => (state, action) => {
+  const { attackType, target, amount } = action;
+  const db = R.prop('db', state);
+  const currentWounds = R.path(['actors', target, 'wounds'], state);
+  const maxHealth = R.path(['actors', target, 'maxHealth'], state);
+  const wound = {
+    location: 'head',
+    attackType,
+    amount,
+    effect: 'bleeding',
   };
+  const wounds = R.append(wound, currentWounds);
+  const health = deriveHealth(maxHealth, wounds)
+  const status = deriveStatus(health)
+  updateActor(db, target, {wounds, status})
+  return R.over(
+    woundsLens(target),
+    R.pipe(R.defaultTo([]), R.append(wound))
+  )(state);
+};
 
 const handleAttack = handleHealthMutation(R.subtract);
 const handleHeal = handleHealthMutation(R.add);
@@ -54,7 +53,7 @@ const clearEffectiveMoves = R.assoc('effectiveMoves', []);
 const clearPlannedMoves = (ticMoves) =>
   R.over(R.lensProp('plannedMoves'), R.omit(R.keys(ticMoves)));
 
-const isDead = R.propEq('health', 0);
+const isDead = R.propEq('status', 'DEAD');
 const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
 const knownActions = {
