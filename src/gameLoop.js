@@ -41,11 +41,9 @@ const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 const currentWounds = R.path(['actors', target, 'wounds'], state);
 const byAmount = R.descend(R.prop('amount'))
 const woundSort = R.sort(byAmount, currentWounds)
-console.log("before:", woundSort)
-const newWounds = R.drop(1, woundSort)
-updateActor(db, target, {wounds: newWounds})
-console.log("after:", newWounds)
-return R.over(woundsLens(target), R.always(newWounds), state)
+const wounds = R.drop(1, woundSort)
+updateActor(db, target, {wounds})
+return R.over(woundsLens(target), R.always(wounds), state)
 
 }
 
