@@ -4,6 +4,7 @@ import ProgressBar from '@ramonak/react-progress-bar';
 import { selectActionStatus } from './selectActionStatus';
 import ActionStatus from './ActionStatus';
 import { canPlanMove } from './actorSelectors';
+import { deriveHealth } from './deriveHealth';
 import styled from 'styled-components';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
@@ -17,24 +18,36 @@ export default function Character({
   dispatch,
   isCurrent,
   currentTic,
-  children
+  children,
 }) {
-  const actor = R.path(['actors', id], state)
-  const {health, name, target, isTargeting, currentAction} = actor
+  const actor = R.path(['actors', id], state);
+  const {
+    wounds = [],
+    maxHealth,
+    name,
+    target,
+    isTargeting,
+    currentAction,
+  } = actor;
+  const health = deriveHealth(maxHealth, wounds);
   const disableTarget = !canPlanMove(id, state) || !isCurrent || isTargeting;
   const disableAttack = disableTarget || R.isNil(target);
-  const disableDone = disableAttack || R.isNil(currentAction)
+  const disableDone = disableAttack || R.isNil(currentAction);
   return (
     <Style>
       <div>{name}</div>
-      <ProgressBar bgColor={color} completed={health} />
+      <ProgressBar
+        bgColor={color}
+        completed={health}
+        maxCompleted={maxHealth}
+      />
       <button
         title="Set Target"
         disabled={disableTarget}
         onClick={() =>
           dispatch({
             type: 'beginTargeting',
-            actor: id
+            actor: id,
           })
         }
       >
