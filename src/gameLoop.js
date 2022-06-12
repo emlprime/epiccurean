@@ -13,7 +13,7 @@ const getHeals = getByType(isHeal);
 
 const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 
-const handleHealthMutation = (mutation) => (state, action) => {
+const handleAttack = (state, action) => {
   const { attackType, target, amount } = action;
   const db = R.prop('db', state);
   const currentWounds = R.path(['actors', target, 'wounds'], state);
@@ -34,8 +34,16 @@ const handleHealthMutation = (mutation) => (state, action) => {
   )(state);
 };
 
-const handleAttack = handleHealthMutation(R.subtract);
-const handleHeal = handleHealthMutation(R.add);
+const handleHeal = (state, action) => {
+const {target} = action
+const currentWounds = R.path(['actors', target, 'wounds'], state);
+const byAmount = R.descend(R.prop('amount'))
+const woundSort = R.sort(byAmount, currentWounds)
+const newWounds = R.drop(1, woundSort)
+console.log(newWounds)
+return state
+
+}
 
 const reduceAttack = (state) =>
   R.reduce(handleAttack, state, getAttacks(R.prop('effectiveMoves', state)));
@@ -57,10 +65,10 @@ const isDead = R.propEq('status', 'DEAD');
 const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
 const knownActions = {
-  scratch: { type: 'Attack', amount: 4, planOffset: 2 },
+  scratch: { type: 'Attack', amount: 4, planOffset: 20 },
   scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
-  stabby: { type: 'Attack', amount: 15, planOffset: 5 },
-  lifegiver: { type: 'Heal', amount: 50, planOffset: 10 },
+  stabby: { type: 'Attack', amount: 15, planOffset: 10 },
+  lifegiver: { type: 'Heal', amount: 50, planOffset: 1 },
   quickie: { type: 'Heal', amount: 5, planOffset: 2 },
 };
 
@@ -152,6 +160,7 @@ const setMove = (state, action) => {
 
 const setPlannedMove = (state, action) => {
   const { actor, currentTic } = action;
+
   const actionTemplate = planAction(state, currentTic, actor);
   const target = R.path(['actors', actor, 'target'], state);
   const plannedMove = R.assoc('target', target, actionTemplate);
