@@ -57,7 +57,6 @@ const actors = {
 const actorIds = R.keys(actors);
 
 export const resetActors = (db) => {
-  console.log('reset');
   R.map((id) => {
     const actor = R.prop(id, actors);
     setDoc(doc(db, 'actors', id), actor);

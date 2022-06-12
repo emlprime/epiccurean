@@ -36,12 +36,16 @@ const handleAttack = (state, action) => {
 
 const handleHeal = (state, action) => {
 const {target} = action
+const db = R.prop('db', state);
+const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 const currentWounds = R.path(['actors', target, 'wounds'], state);
 const byAmount = R.descend(R.prop('amount'))
 const woundSort = R.sort(byAmount, currentWounds)
+console.log("before:", woundSort)
 const newWounds = R.drop(1, woundSort)
-console.log(newWounds)
-return state
+updateActor(db, target, {wounds: newWounds})
+console.log("after:", newWounds)
+return R.over(woundsLens(target), R.always(newWounds), state)
 
 }
 
