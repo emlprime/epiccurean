@@ -145,7 +145,9 @@ function turn(state, action) {
 
 const setMove = (state, action) => {
   const { actor, currentAction } = action;
-  return R.assocPath(['actors', actor, 'currentAction'], currentAction, state);
+  const db = R.prop('db', state);
+  updateActor(db, actor, {currentAction})
+  return state
 };
 
 const setPlannedMove = (state, action) => {
@@ -158,10 +160,9 @@ const setPlannedMove = (state, action) => {
 
 const setTarget = (state, action) => {
   const { target, actor } = action;
-  return R.pipe(
-    R.assocPath(['actors', actor, 'target'], target),
-    R.dissocPath(['actors', actor, 'isTargeting'])
-  )(state);
+  const db = R.prop('db', state);
+  updateActor(db, actor, {target})
+  return R.dissocPath(['actors', actor, 'isTargeting'], state)
 };
 
 const beginTargeting = (state, action) => {
