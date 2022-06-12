@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
-import { updateActor } from './mutations';
+import { setActors, updateActor } from './mutations';
 import { deriveHealth, deriveStatus } from './deriveThings'
 
 
@@ -15,7 +15,6 @@ const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 
 const handleAttack = (state, action) => {
   const { attackType, target, amount } = action;
-  const db = R.prop('db', state);
   const currentWounds = R.path(['actors', target, 'wounds'], state);
   const maxHealth = R.path(['actors', target, 'maxHealth'], state);
   const wound = {
@@ -27,7 +26,6 @@ const handleAttack = (state, action) => {
   const wounds = R.append(wound, currentWounds);
   const health = deriveHealth(maxHealth, wounds)
   const status = deriveStatus(health)
-  updateActor(db, target, {wounds, status})
   return R.over(
     woundsLens(target),
     R.pipe(R.defaultTo([]), R.append(wound))
@@ -36,13 +34,10 @@ const handleAttack = (state, action) => {
 
 const handleHeal = (state, action) => {
 const {target} = action
-const db = R.prop('db', state);
-const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 const currentWounds = R.path(['actors', target, 'wounds'], state);
 const byAmount = R.descend(R.prop('amount'))
 const woundSort = R.sort(byAmount, currentWounds)
 const wounds = R.drop(1, woundSort)
-updateActor(db, target, {wounds})
 return R.over(woundsLens(target), R.always(wounds), state)
 
 }
@@ -130,7 +125,13 @@ const disableDeadActors = (state) => {
   const deadActors = bringOutYourDead(state);
   return R.over(R.lensProp('plannedMoves'), R.omit(deadActors))(state);
 };
-//}
+
+const persistActors = (state) => {
+  const actors = R.prop('actors', state)
+  const db = R.prop('db', state)
+  setActors(db, actors)
+  return state
+}
 
 const reduceMoves = R.curry((ticMoves, currentTic, state) =>
   R.pipe(
@@ -139,7 +140,8 @@ const reduceMoves = R.curry((ticMoves, currentTic, state) =>
     reduceContext,
     clearEffectiveMoves,
     disableDeadActors,
-    planAIMoves(currentTic)
+    planAIMoves(currentTic),
+    persistActors,
   )(state)
 );
 
