@@ -1,5 +1,6 @@
 import React from 'react';
 import * as R from 'ramda';
+import ActorStatus from './ActorStatus'
 import { canPlanMove } from './actorSelectors';
 import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
 import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
@@ -21,6 +22,7 @@ const disableDone = disableAttack || R.isNil(currentAction);
   return (
   <div>
     <div>{name} </div>
+    <ActorStatus/>
     <button
         title="Set Target"
         disabled={disableTarget}
@@ -76,9 +78,12 @@ const disableDone = disableAttack || R.isNil(currentAction);
       >
         <GiPlayButton />
       </button>
-    <pre>{JSON.stringify(currentPlayer, null, 2)}</pre>
     <div> {targetName} </div>
+    <ActorStatus/>
     </div>)
 }
 
 export default CurrentCharacter
+
+//<pre>{JSON.stringify(currentPlayer, null, 2)}</pre>
+    

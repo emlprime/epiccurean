@@ -66,10 +66,10 @@ const isDead = R.propEq('status', 'DEAD');
 const bringOutYourDead = R.pipe(R.prop('actors'), R.filter(isDead), R.keys);
 
 const knownActions = {
-  scratch: { type: 'Attack', amount: 4, planOffset: 20 },
+  scratch: { type: 'Attack', amount: 4, planOffset: 2 },
   scrappin: { type: 'Attack', amount: 20, planOffset: 8 },
-  stabby: { type: 'Attack', amount: 15, planOffset: 10 },
-  lifegiver: { type: 'Heal', amount: 50, planOffset: 1 },
+  stabby: { type: 'Attack', amount: 15, planOffset: 5 },
+  lifegiver: { type: 'Heal', amount: 50, planOffset: 6 },
   quickie: { type: 'Heal', amount: 5, planOffset: 2 },
 };
 
