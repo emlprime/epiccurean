@@ -18,11 +18,29 @@ const disableTarget = !canPlanMove(id, state) || isTargeting;
 const currentAction = R.prop('currentAction', currentPlayer)
 const disableAttack = disableTarget || R.isNil(targetId);
 const disableDone = disableAttack || R.isNil(currentAction);
+const playerStatuses = {
+  head: 0,
+  leftarm: 1,
+  rightarm: 2,
+  body: 3,
+  leftleg: 4,
+  rightleg: 5,
+};
+const targetStatuses = {
+  head: 0,
+  leftarm: 0,
+  rightarm: 0,
+  body: 0,
+  leftleg: 0,
+  rightleg: 5,
+};
+
 
   return (
   <div>
     <div>{name} </div>
-    <ActorStatus/>
+    <ActorStatus
+    statuses = {playerStatuses}/>
     <button
         title="Set Target"
         disabled={disableTarget}
@@ -79,7 +97,8 @@ const disableDone = disableAttack || R.isNil(currentAction);
         <GiPlayButton />
       </button>
     <div> {targetName} </div>
-    <ActorStatus/>
+    <ActorStatus
+    statuses = {targetStatuses}/>
     </div>)
 }
 
