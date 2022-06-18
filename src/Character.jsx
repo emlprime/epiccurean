@@ -6,10 +6,6 @@ import ActionStatus from './ActionStatus';
 import { canPlanMove } from './actorSelectors';
 import { deriveHealth } from './deriveThings';
 import styled from 'styled-components';
-import { GiBroadsword } from '@react-icons/all-files/gi/GiBroadsword';
-import { GiTargeting } from '@react-icons/all-files/gi/GiTargeting';
-import { GiHealthPotion } from '@react-icons/all-files/gi/GiHealthPotion';
-import { GiPlayButton } from '@react-icons/all-files/gi/GiPlayButton';
 
 export default function Character({
   id,
@@ -30,9 +26,7 @@ export default function Character({
     currentAction,
   } = actor;
   const health = deriveHealth(maxHealth, wounds);
-  const disableTarget = !canPlanMove(id, state) || !isCurrent || isTargeting;
-  const disableAttack = disableTarget || R.isNil(target);
-  const disableDone = disableAttack || R.isNil(currentAction);
+ 
   return (
     <Style>
       <div>{name}</div>
@@ -41,61 +35,7 @@ export default function Character({
         completed={health}
         maxCompleted={maxHealth}
       />
-      <button
-        title="Set Target"
-        disabled={disableTarget}
-        onClick={() =>
-          dispatch({
-            type: 'beginTargeting',
-            actor: id,
-          })
-        }
-      >
-        <GiTargeting />
-      </button>
-      <button
-        title="Leeerooooy Jenkins!!!"
-        disabled={disableAttack}
-        onClick={() =>
-          dispatch({
-            type: 'setMove',
-            currentAction: 'stabby',
-            actor: id,
-            target: target,
-            currentTic,
-          })
-        }
-      >
-        <GiBroadsword />
-      </button>
-      <button
-        title="MEDIC!!!!"
-        disabled={disableAttack}
-        onClick={() =>
-          dispatch({
-            type: 'setMove',
-            currentAction: 'lifegiver',
-            actor: id,
-            target: target,
-            currentTic,
-          })
-        }
-      >
-        <GiHealthPotion />
-      </button>
-      <button
-        title="done"
-        disabled={disableDone}
-        onClick={() =>
-          dispatch({
-            type: 'setPlannedMove',
-            actor: id,
-            currentTic,
-          })
-        }
-      >
-        <GiPlayButton />
-      </button>
+      
       {children}
       <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>

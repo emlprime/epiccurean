@@ -3,6 +3,7 @@ import * as R from 'ramda';
 import styled from 'styled-components';
 import Profile from './Profile';
 import Character from './Character';
+import CurrentCharacter from './CurrentCharacter';
 import ActionStatus from './ActionStatus';
 import AI from './AI';
 import Loop from './Loop';
@@ -38,7 +39,6 @@ export default function Fight({ db }) {
 
   const [currentTic, setCurrentTic] = useState(0);
   const players = R.view(availableLivingPlayers, state);
-  const actors = R.prop('actors', state);
   const currentPlayer = getCurrentPlayer(players);
   const takeTurn = useCallback(
     (tic) => {
@@ -116,6 +116,12 @@ export default function Fight({ db }) {
           )}
         </Profile>
       </section>
+      <CurrentCharacter
+      currentPlayer = {currentPlayer}
+      state={state}
+      dispatch = {dispatch}
+      currentTic = {currentTic}
+      />
     </Style>
   );
 }

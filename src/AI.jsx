@@ -14,7 +14,6 @@ export default function AI({ id, color, state, currentTic, children }) {
       <div>{name}</div>
       <ProgressBar bgColor={color} completed={health} maxCompleted={maxHealth} />
       {children}
-      <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>    
   );
 }
