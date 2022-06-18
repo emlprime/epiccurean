@@ -20,7 +20,7 @@ const ActorStatus = ({statuses}) => {
  
   const getFill = getFillByStatus(statusColor, statuses)
   return (
-    <svg viewBox="0 0 200 200">
+    <svg viewBox="0 0 100 100">
       <g stroke="black" fill="none" strokeWidth="1">
         <circle cx="27" cy="10" r="8" fill={getFill('head')} />
 
