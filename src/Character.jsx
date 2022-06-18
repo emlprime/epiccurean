@@ -37,7 +37,6 @@ export default function Character({
       />
       
       {children}
-      <ActionStatus {...selectActionStatus(id, currentTic, state)} />
     </Style>
   );
 }

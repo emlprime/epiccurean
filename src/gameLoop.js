@@ -12,6 +12,7 @@ const getAttacks = getByType(isAttack);
 const getHeals = getByType(isHeal);
 
 const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
+const actorLens = (id) => R.lensPath(['actors', id]);
 
 const handleAttack = (state, action) => {
   const { attackType, target, amount } = action;
@@ -26,10 +27,13 @@ const handleAttack = (state, action) => {
   const wounds = R.append(wound, currentWounds);
   const health = deriveHealth(maxHealth, wounds)
   const status = deriveStatus(health)
-  return R.over(
+  return R.pipe(
+    R.over(
     woundsLens(target),
     R.pipe(R.defaultTo([]), R.append(wound))
-  )(state);
+  ),
+  R.over(actorLens(target), R.assoc('status', status)))
+  (state);
 };
 
 const handleHeal = (state, action) => {
