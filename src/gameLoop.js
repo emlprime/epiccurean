@@ -38,7 +38,7 @@ const handleAttack = (state, action) => {
 
 const handleHeal = (state, action) => {
 const {target} = action
-const currentWounds = R.path(['actors', target, 'wounds'], state);
+const currentWounds = R.pathOr([], ['actors', target, 'wounds'], state);
 const byAmount = R.descend(R.prop('amount'))
 const woundSort = R.sort(byAmount, currentWounds)
 const wounds = R.drop(1, woundSort)
