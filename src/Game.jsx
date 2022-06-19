@@ -4,7 +4,7 @@ import REPL from './REPL';
 import Fight from './Fight';
 
 const Game = ({ db }) => {
-  const [tab, setTab] = useState('FIGHT');
+  const [tab, setTab] = useState('REPL');
   return (
     <>
       <article>
