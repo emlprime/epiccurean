@@ -13,7 +13,9 @@ import {
 } from 'firebase/firestore';
 import './style.css';
 import Fight from './Fight';
+import Game from "./Game"
 import { getCurrentUser } from './CurrentUser';
+
 
 // Configure Firebase.
 //TODO remove api key from github
@@ -73,12 +75,11 @@ function App() {
           </button>
         </div>
       </header>
-
-      <Fight db={db} />
+<Game db={db}/>
     </Style>
   );
 }
-
+//<Fight db={db} />
 export default App;
 
 const Style = styled.div`
