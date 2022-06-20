@@ -8,7 +8,7 @@ const rubric1 = {
   rightarm: false,
   leftleg: true,
   rightleg: false,
-  none: false
+  none: false,
 };
 const rubric2 = {
   head: false,
@@ -17,7 +17,7 @@ const rubric2 = {
   rightarm: false,
   leftleg: true,
   rightleg: true,
-  none: false
+  none: false,
 };
 
 const oddsToHit = R.gt;
@@ -29,7 +29,7 @@ const calcBodyPartHitResult = R.applySpec({
   rightarm: oddsToHit(0.8),
   leftleg: oddsToHit(0.1),
   rightleg: oddsToHit(0.7),
-  none: R.F
+  none: R.F,
 });
 
 const bodyPartOdds = {
@@ -39,7 +39,7 @@ const bodyPartOdds = {
   rightarm: 8,
   leftleg: 1,
   rightleg: 7,
-  none: 20
+  none: 20,
 };
 
 const attack1 = {
@@ -64,14 +64,63 @@ const didYouGetHit = (attack) => {
 };
 
 const didYouGetHitDynamic = (attackBase = {}) => {
-const random = Math.random()
-const targetRubric = calcBodyPartHitResult(random)
-const bodyPartIndex = randomizeIndex()
-const bodyPart = getBodyPart(bodyPartIndex)
-const attack = R.mergeLeft({targetRubric, bodyPartIndex}, attackBase)
-const result = didYouGetHit(attack)
-return {result,bodyPart, ...attack}
+  const random = Math.random();
+  const targetRubric = calcBodyPartHitResult(random);
+  const bodyPartIndex = randomizeIndex();
+  const bodyPart = getBodyPart(bodyPartIndex);
+  const attack = R.mergeLeft({ targetRubric, bodyPartIndex }, attackBase);
+  const result = didYouGetHit(attack);
+  return { result, bodyPart, ...attack };
+};
+
+const deriveWoundAmount = (hitBundle) => {
+  const isAttended = R.equals(
+    R.prop('actorId', hitBundle),
+    R.prop('targetOfTargetId', hitBundle)
+  );
+  const baseAmount = R.prop('amount', hitBundle);
+  const amount = isAttended ? baseAmount / 2 : baseAmount * 2;
+  return {isAttended, baseAmount, amount};
+};
+
+const deriveWound = (hitBundle) => {
+  const woundAmountBundle =  deriveWoundAmount(hitBundle)
+  const wound = {
+    location: R.prop('bodyPart', hitBundle),
+    attackType: 'stabbed',
+    amount: R.prop('amount', woundAmountBundle),
+    effect: 'bleeding',
+  };
+  return {wound, woundAmountBundle};
+
+};
+
+const deriveWoundNotification = (woundBundle) => {
+  console.log(woundBundle)
+  const {wound: {amount, attackType, location, effect}} = woundBundle
+  return `TARGET got ${deriveDamageAdjective(amount)} ${attackType} in the ${location} and is now ${effect}`
 }
+
+const deriveDamageAdjective = R.cond([
+  [R.lt(90), R.always('brutally')],
+  [R.lt(60), R.always('severely')],
+  [R.lt(30), R.always('moderately')],
+  [R.T, R.always('mildly')],
+])
+
+
+
+
+const handleAttack = (attack) => {
+  const hitBundle = didYouGetHitDynamic(attack);
+  if (R.prop('result', hitBundle)) {
+    const woundBundle = deriveWound(hitBundle, attack);
+    const wound = R.prop('wound', woundBundle)
+    return { hitBundle, notification: deriveWoundNotification(woundBundle), wound };
+  }
+  return { hitBundle, notification: 'womp womp' };
+};
+
 const deriveBodyPart = (attack) =>
   R.propOr(getBodyPart(R.prop('bodyPartIndex', attack)), 'bodyPart')(attack);
 //if it comes in without a bodypart target, should randomly select one
@@ -92,11 +141,13 @@ const REPL = () => {
     R.map(didYouGetHit, attacks),
     getBodyPart(randomizeIndex()),
     calcBodyPartHitResult(0.5),
-    didYouGetHitDynamic()
-  ]
+    didYouGetHitDynamic(),
+    handleAttack({ amount: 170, actorId: 'abc123', targetOfTargetId: 'abc123' }),
+  ];
 
-  return <pre>{JSON.stringify(
-    R.last(results), null, 2)}</pre>;
+  return <pre>{JSON.stringify(R.last(results), null, 2)}</pre>;
 };
 
 export default REPL;
+
+
