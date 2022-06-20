@@ -20,7 +20,7 @@ const rubric2 = {
   none: false
 };
 
-const oddsToHit = R.lt(R.__);
+const oddsToHit = R.gt;
 const calcBodyPartHitResult = R.applySpec({
   __odds: R.identity,
   head: oddsToHit(0.4),
@@ -63,6 +63,15 @@ const didYouGetHit = (attack) => {
   return hit;
 };
 
+const didYouGetHitDynamic = (attackBase = {}) => {
+const random = Math.random()
+const targetRubric = calcBodyPartHitResult(random)
+const bodyPartIndex = randomizeIndex()
+const bodyPart = getBodyPart(bodyPartIndex)
+const attack = R.mergeLeft({targetRubric, bodyPartIndex}, attackBase)
+const result = didYouGetHit(attack)
+return {result,bodyPart, ...attack}
+}
 const deriveBodyPart = (attack) =>
   R.propOr(getBodyPart(R.prop('bodyPartIndex', attack)), 'bodyPart')(attack);
 //if it comes in without a bodypart target, should randomly select one
@@ -74,16 +83,20 @@ const bodyBag = makeBodyBag();
 const getBodyPart = (index) => bodyBag[index];
 const randomizeIndex = () => {
   const bodyBagLength = R.length(bodyBag);
-  console.log(bodyBagLength)
   return Math.floor(Math.random() * bodyBagLength);
 };
 
 const REPL = () => {
-  const result1 = R.map(calcBodyPartHitResult, R.times(Math.random, 5));
-  const result2 = R.map(didYouGetHit, attacks);
-  const result3 = getBodyPart(randomizeIndex());
+  const results = [
+    R.map(calcBodyPartHitResult, R.times(Math.random, 5)),
+    R.map(didYouGetHit, attacks),
+    getBodyPart(randomizeIndex()),
+    calcBodyPartHitResult(0.5),
+    didYouGetHitDynamic()
+  ]
 
-  return <pre>{JSON.stringify(result2, null, 2)}</pre>;
+  return <pre>{JSON.stringify(
+    R.last(results), null, 2)}</pre>;
 };
 
 export default REPL;
