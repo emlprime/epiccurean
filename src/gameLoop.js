@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
 import { setActors, updateActor } from './mutations';
 import { deriveHealth, deriveStatus } from './deriveThings'
+import { calcAttack} from './calcAttack'
 
 
 const isAttack = R.propEq('type', 'Attack');
@@ -18,19 +19,18 @@ const handleAttack = (state, action) => {
   const { attackType, target, amount } = action;
   const currentWounds = R.path(['actors', target, 'wounds'], state);
   const maxHealth = R.path(['actors', target, 'maxHealth'], state);
-  const wound = {
-    location: 'head',
-    attackType,
-    amount,
-    effect: 'bleeding',
-  };
-  const wounds = R.append(wound, currentWounds);
+  const targetOfTargetId = R.path(['actors', target, 'target'], state)
+  const attack = R.mergeLeft({targetOfTargetId}, action)
+  const attackBundle = calcAttack(state, attack)
+  const {notification, wound} = attackBundle
+  const wounds = R.isNil(wound) ? currentWounds : R.append(wound, currentWounds);
   const health = deriveHealth(maxHealth, wounds)
   const status = deriveStatus(health)
+  const woundFunc = R.isNil(wound) ? R.identity : R.append(wound)
   return R.pipe(
     R.over(
     woundsLens(target),
-    R.pipe(R.defaultTo([]), R.append(wound))
+    R.pipe(R.defaultTo([]), woundFunc)
   ),
   R.over(actorLens(target), R.assoc('status', status)))
   (state);
@@ -53,9 +53,18 @@ const reduceHeal = (state) =>
   R.reduce(handleHeal, state, getHeals(R.prop('effectiveMoves', state)));
 
 const reduceContext = R.pipe(reduceAttack, reduceHeal);
-
+const reduceObject = (index, id, value) => {
+  return (
+  {
+    ...value[id], actorId: id
+  })
+}
+const arrayWithIdsFromObject = R.pipe(
+  R.mapObjIndexed(reduceObject),
+  R.values
+  )
 const addEffectiveMove = (ticMoves) =>
-  R.over(R.lensProp('effectiveMoves'), R.concat(R.values(ticMoves)));
+  R.over(R.lensProp('effectiveMoves'), R.concat(arrayWithIdsFromObject(ticMoves)));
 
 const clearEffectiveMoves = R.assoc('effectiveMoves', []);
 
@@ -168,7 +177,6 @@ const setMove = (state, action) => {
 
 const setPlannedMove = (state, action) => {
   const { actor, currentTic } = action;
-
   const actionTemplate = planAction(state, currentTic, actor);
   const target = R.path(['actors', actor, 'target'], state);
   const plannedMove = R.assoc('target', target, actionTemplate);

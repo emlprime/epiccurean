@@ -54,6 +54,7 @@ const deriveWoundAmount = (hitBundle) => {
     R.prop('actorId', hitBundle),
     R.prop('targetOfTargetId', hitBundle)
   );
+  console.log(hitBundle)
   const baseAmount = R.prop('amount', hitBundle);
   const amount = isAttended ? baseAmount / 2 : baseAmount * 2;
   return {isAttended, baseAmount, amount};
@@ -87,7 +88,7 @@ const deriveDamageAdjective = R.cond([
 
 
 
-export const calcAttack = (attack) => {
+export const calcAttack = (state, attack) => {
   const hitBundle = didYouGetHitDynamic(attack);
   if (R.prop('result', hitBundle)) {
     const woundBundle = deriveWound(hitBundle, attack);
@@ -137,23 +138,4 @@ const didYouGetHitDynamic = (attackBase = {}) => {
   const result = didYouGetHit(attack);
   return { result, bodyPart, ...attack };
 };
-
-
-
-const REPL = () => {
-  const results = [
-    R.map(calcBodyPartHitResult, R.times(Math.random, 5)),
-    R.map(didYouGetHit, attacks),
-    getBodyPart(randomizeIndex()),
-    calcBodyPartHitResult(0.5),
-    didYouGetHitDynamic(),
-    calcAttack({ amount: 170, actorId: 'abc123', targetOfTargetId: 'abc123' }),
-  ];
-
-  return <pre>{JSON.stringify(R.last(results), null, 2)}</pre>;
-};
-
-export default REPL;
-
-
 
