@@ -32,7 +32,6 @@ const calcBodyPartHitResult = R.applySpec({
   none: R.F,
 });
 
-
 const attack1 = {
   bodyPartIndex: 40,
   bodyPart: 'leftarm',
@@ -54,46 +53,50 @@ const deriveWoundAmount = (hitBundle) => {
     R.prop('actorId', hitBundle),
     R.prop('targetOfTargetId', hitBundle)
   );
-  console.log(hitBundle)
+  console.log(hitBundle);
   const baseAmount = R.prop('amount', hitBundle);
   const amount = isAttended ? baseAmount / 2 : baseAmount * 2;
-  return {isAttended, baseAmount, amount};
+  return { isAttended, baseAmount, amount };
 };
 
 const deriveWound = (hitBundle) => {
-  const woundAmountBundle =  deriveWoundAmount(hitBundle)
+  const woundAmountBundle = deriveWoundAmount(hitBundle);
   const wound = {
     location: R.prop('bodyPart', hitBundle),
     attackType: 'stabbed',
     amount: R.prop('amount', woundAmountBundle),
     effect: 'bleeding',
   };
-  return {wound, woundAmountBundle};
-
+  return { wound, woundAmountBundle };
 };
 
 const deriveWoundNotification = (woundBundle) => {
-  console.log(woundBundle)
-  const {wound: {amount, attackType, location, effect}} = woundBundle
-  return `TARGET got ${deriveDamageAdjective(amount)} ${attackType} in the ${location} and is now ${effect}`
-}
+  console.log(woundBundle);
+  const {
+    wound: { amount, attackType, location, effect },
+  } = woundBundle;
+  return `TARGET got ${deriveDamageAdjective(
+    amount
+  )} ${attackType} in the ${location} and is now ${effect}`;
+};
 
 const deriveDamageAdjective = R.cond([
   [R.lt(90), R.always('brutally')],
   [R.lt(60), R.always('severely')],
   [R.lt(30), R.always('moderately')],
   [R.T, R.always('mildly')],
-])
-
-
-
+]);
 
 export const calcAttack = (state, attack) => {
   const hitBundle = didYouGetHitDynamic(attack);
   if (R.prop('result', hitBundle)) {
     const woundBundle = deriveWound(hitBundle, attack);
-    const wound = R.prop('wound', woundBundle)
-    return { hitBundle, notification: deriveWoundNotification(woundBundle), wound };
+    const wound = R.prop('wound', woundBundle);
+    return {
+      hitBundle,
+      notification: deriveWoundNotification(woundBundle),
+      wound,
+    };
   }
   return { hitBundle, notification: 'womp womp' };
 };
@@ -102,15 +105,14 @@ const deriveBodyPart = (attack) =>
   R.propOr(getBodyPart(R.prop('bodyPartIndex', attack)), 'bodyPart')(attack);
 
 const bodyPartOdds = {
-    head: 4,
-    body: 8,
-    leftarm: 2,
-    rightarm: 8,
-    leftleg: 1,
-    rightleg: 7,
-    none: 20,
+  head: 4,
+  body: 8,
+  leftarm: 2,
+  rightarm: 8,
+  leftleg: 1,
+  rightleg: 7,
+  none: 20,
 };
-  
 
 const generateBodyParts = (odds, part) => R.repeat(part, odds);
 const makeBodyBag = () =>
@@ -138,4 +140,3 @@ const didYouGetHitDynamic = (attackBase = {}) => {
   const result = didYouGetHit(attack);
   return { result, bodyPart, ...attack };
 };
-

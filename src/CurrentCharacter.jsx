@@ -8,6 +8,16 @@ import { GiHealthPotion } from '@react-icons/all-files/gi/GiHealthPotion';
 import { GiPlayButton } from '@react-icons/all-files/gi/GiPlayButton';
 import style from 'styled-components';
 
+const deriveStatus = R.pipe(
+  R.groupBy(R.prop('location')),
+  R.map(
+    R.pipe(
+      R.pluck(['amount']),
+      R.sum
+    )
+  )
+  )
+
 const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
   const name = R.prop('name', currentPlayer);
   const targetId = R.prop('target', currentPlayer);
@@ -18,22 +28,10 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
   const currentAction = R.prop('currentAction', currentPlayer);
   const disableAttack = disableTarget || R.isNil(targetId);
   const disableDone = disableAttack || R.isNil(currentAction);
-  const playerStatuses = {
-    head: 0,
-    leftarm: 1,
-    rightarm: 2,
-    body: 3,
-    leftleg: 4,
-    rightleg: 5,
-  };
-  const targetStatuses = {
-    head: 0,
-    leftarm: 0,
-    rightarm: 0,
-    body: 0,
-    leftleg: 0,
-    rightleg: 5,
-  };
+  const playerWounds = R.propOr([], 'wounds', currentPlayer)
+  const targetWounds = R.pathOr([], ['actors', targetId, 'wounds'], state)
+  const playerStatuses = deriveStatus(playerWounds)
+  const targetStatuses = deriveStatus(targetWounds)
 
   return (
     <Style>
