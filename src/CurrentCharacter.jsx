@@ -10,13 +10,8 @@ import style from 'styled-components';
 
 const deriveStatus = R.pipe(
   R.groupBy(R.prop('location')),
-  R.map(
-    R.pipe(
-      R.pluck(['amount']),
-      R.sum
-    )
-  )
-  )
+  R.map(R.pipe(R.pluck(['amount']), R.sum))
+);
 
 const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
   const name = R.prop('name', currentPlayer);
@@ -28,11 +23,11 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
   const currentAction = R.prop('currentAction', currentPlayer);
   const disableAttack = disableTarget || R.isNil(targetId);
   const disableDone = disableAttack || R.isNil(currentAction);
-  const playerWounds = R.propOr([], 'wounds', currentPlayer)
-  const targetWounds = R.pathOr([], ['actors', targetId, 'wounds'], state)
-  const playerStatuses = deriveStatus(playerWounds)
-  const targetStatuses = deriveStatus(targetWounds)
-
+  const playerWounds = R.propOr([], 'wounds', currentPlayer);
+  const targetWounds = R.pathOr([], ['actors', targetId, 'wounds'], state);
+  const playerStatuses = deriveStatus(playerWounds);
+  const targetStatuses = deriveStatus(targetWounds);
+console.log(currentPlayer)
   return (
     <Style>
       <div id="playername">{name} </div>
@@ -96,10 +91,14 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
           <GiPlayButton />
         </button>
       </div>
-      <div id="targetname"> {targetName} </div>
-      <div id="targetstatus">
-        <ActorStatus statuses={targetStatuses} />
-      </div>
+      {targetId && (
+        <>
+          <div id="targetname"> {targetName} </div>
+          <div id="targetstatus">
+            <ActorStatus statuses={targetStatuses} />
+          </div>
+        </>
+      )}
     </Style>
   );
 };

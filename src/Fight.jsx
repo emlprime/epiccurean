@@ -116,12 +116,13 @@ export default function Fight({ db }) {
           )}
         </Profile>
       </section>
+      {currentPlayer &&
       <CurrentCharacter
       currentPlayer = {currentPlayer}
       state={state}
       dispatch = {dispatch}
       currentTic = {currentTic}
-      />
+      />}
     </Style>
   );
 }
