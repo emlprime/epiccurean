@@ -1,25 +1,6 @@
 import React from 'react';
 import * as R from 'ramda';
 
-const rubric1 = {
-  head: true,
-  body: false,
-  leftarm: true,
-  rightarm: false,
-  leftleg: true,
-  rightleg: false,
-  none: false,
-};
-const rubric2 = {
-  head: false,
-  body: true,
-  leftarm: true,
-  rightarm: false,
-  leftleg: true,
-  rightleg: true,
-  none: false,
-};
-
 const oddsToHit = R.gt;
 const calcBodyPartHitResult = R.applySpec({
   __odds: R.identity,
@@ -31,22 +12,6 @@ const calcBodyPartHitResult = R.applySpec({
   rightleg: oddsToHit(0.7),
   none: R.F,
 });
-
-const attack1 = {
-  bodyPartIndex: 40,
-  bodyPart: 'leftarm',
-  targetRubric: rubric1,
-};
-const attack2 = { bodyPartIndex: 29, target: 'Bob', targetRubric: rubric2 };
-const attack3 = {
-  bodyPartIndex: 10,
-  bodyPart: 'rightarm',
-  targetRubric: rubric1,
-};
-const attack4 = { bodyPartIndex: 45, target: 'Bob', targetRubric: rubric1 };
-const attacks = [attack1, attack2, attack3, attack4];
-
-
 
 const deriveWoundAmount = (hitBundle) => {
   const isAttended = R.equals(

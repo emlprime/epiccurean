@@ -35,7 +35,7 @@ export default function Character({
         completed={health}
         maxCompleted={maxHealth}
       />
-      
+      <div>{currentAction}</div>
       {children}
     </Style>
   );
