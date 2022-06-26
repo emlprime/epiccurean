@@ -26,6 +26,7 @@ const deriveWoundAmount = (hitBundle) => {
 const deriveWound = (hitBundle) => {
   const woundAmountBundle = deriveWoundAmount(hitBundle);
   const wound = {
+    actorId: R.prop('actorId', hitBundle),
     target: R.prop('target', hitBundle),
     location: R.prop('bodyPart', hitBundle),
     attackType: 'stabbed',
@@ -41,9 +42,12 @@ const deriveWoundNotification = (state, woundBundle) => {
   } = woundBundle;
   const targetId = R.path(['wound', 'target'], woundBundle)
   const targetName = R.path(['actors', targetId, 'name'], state)
+  const actorId = R.path(['wound', 'actorId'], woundBundle)
+  const actorName = R.path(['actors', actorId, 'name'], state)
+  console.log(actorName)
   return `${targetName} got ${deriveDamageAdjective(
     amount
-  )} ${attackType} in the ${location} and is now ${effect}`;
+  )} ${attackType} in the ${location} by ${actorName} and is now ${effect}`;
 };
 
 const deriveDamageAdjective = R.cond([
