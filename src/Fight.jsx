@@ -17,13 +17,17 @@ import {
 } from './actorSelectors';
 import { GiHumanTarget } from '@react-icons/all-files/gi/GiHumanTarget';
 import { watchActors } from './getActors';
+import useTimeout from 'use-timeout'
+import { resetActors } from './resetActors';
+
+
 const initialState = {
   actors: {},
   characterRoster: [],
   plannedMoves: {},
   effectiveMoves: [],
+  notifications: []
 };
-import { resetActors } from './resetActors';
 
 export default function Fight({ db }) {
   const [state, dispatch] = useReducer(
@@ -50,6 +54,8 @@ export default function Fight({ db }) {
 
   const currentPlayerId = R.prop('id', currentPlayer);
   const needTarget = R.path(['actors', currentPlayerId, 'isTargeting'], state);
+  useTimeout(() => {console.log('timeOut')}, 2000)
+  const notification = R.head(R.prop('notifications', state))
   return (
     <Style>
       <header>
@@ -87,6 +93,7 @@ export default function Fight({ db }) {
             getCharacterIds(state)
           )}
         </Profile>
+        <div>{notification}</div>
         <Profile className="right">
           {R.map(
             (id) => (

@@ -18,9 +18,10 @@
     "react-icons": "4.3.1",
     "react-is": "17.0.2",
     "react-progress-bar": "0.1.0",
-    "react-router-dom": "^6.3.0",
+    "react-router-dom": "6.3.0",
     "styled-components": "5.3.5",
-    "use-interval": "1.4.0"
+    "use-interval": "1.4.0",
+    "use-timeout": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

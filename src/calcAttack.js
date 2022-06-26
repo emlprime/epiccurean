@@ -18,7 +18,6 @@ const deriveWoundAmount = (hitBundle) => {
     R.prop('actorId', hitBundle),
     R.prop('targetOfTargetId', hitBundle)
   );
-  console.log(hitBundle);
   const baseAmount = R.prop('amount', hitBundle);
   const amount = isAttended ? baseAmount / 2 : baseAmount * 2;
   return { isAttended, baseAmount, amount };
@@ -27,6 +26,7 @@ const deriveWoundAmount = (hitBundle) => {
 const deriveWound = (hitBundle) => {
   const woundAmountBundle = deriveWoundAmount(hitBundle);
   const wound = {
+    target: R.prop('target', hitBundle),
     location: R.prop('bodyPart', hitBundle),
     attackType: 'stabbed',
     amount: R.prop('amount', woundAmountBundle),
@@ -35,12 +35,13 @@ const deriveWound = (hitBundle) => {
   return { wound, woundAmountBundle };
 };
 
-const deriveWoundNotification = (woundBundle) => {
-  console.log(woundBundle);
+const deriveWoundNotification = (state, woundBundle) => {
   const {
     wound: { amount, attackType, location, effect },
   } = woundBundle;
-  return `TARGET got ${deriveDamageAdjective(
+  const targetId = R.path(['wound', 'target'], woundBundle)
+  const targetName = R.path(['actors', targetId, 'name'], state)
+  return `${targetName} got ${deriveDamageAdjective(
     amount
   )} ${attackType} in the ${location} and is now ${effect}`;
 };
@@ -55,11 +56,11 @@ const deriveDamageAdjective = R.cond([
 export const calcAttack = (state, attack) => {
   const hitBundle = didYouGetHitDynamic(attack);
   if (R.prop('result', hitBundle)) {
-    const woundBundle = deriveWound(hitBundle, attack);
+    const woundBundle = deriveWound(hitBundle);
     const wound = R.prop('wound', woundBundle);
     return {
       hitBundle,
-      notification: deriveWoundNotification(woundBundle),
+      notification: deriveWoundNotification(state, woundBundle),
       wound,
     };
   }

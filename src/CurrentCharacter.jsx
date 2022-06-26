@@ -27,7 +27,6 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
   const targetWounds = R.pathOr([], ['actors', targetId, 'wounds'], state);
   const playerStatuses = deriveStatus(playerWounds);
   const targetStatuses = deriveStatus(targetWounds);
-console.log(currentPlayer)
   return (
     <Style>
       <div id="playername">{name} </div>

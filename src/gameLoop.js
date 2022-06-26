@@ -1,9 +1,8 @@
 import * as R from 'ramda';
 import { getAIIds, getCharacterIds } from './getIds';
 import { setActors, updateActor } from './mutations';
-import { deriveHealth, deriveStatus } from './deriveThings'
-import { calcAttack} from './calcAttack'
-
+import { deriveHealth, deriveStatus } from './deriveThings';
+import { calcAttack } from './calcAttack';
 
 const isAttack = R.propEq('type', 'Attack');
 const isHeal = R.propEq('type', 'Heal');
@@ -14,37 +13,38 @@ const getHeals = getByType(isHeal);
 
 const woundsLens = (id) => R.lensPath(['actors', id, 'wounds']);
 const actorLens = (id) => R.lensPath(['actors', id]);
+const notifyLens = R.lensProp('notifications');
 
 const handleAttack = (state, action) => {
   const { attackType, target, amount } = action;
   const currentWounds = R.path(['actors', target, 'wounds'], state);
   const maxHealth = R.path(['actors', target, 'maxHealth'], state);
-  const targetOfTargetId = R.path(['actors', target, 'target'], state)
-  const attack = R.mergeLeft({targetOfTargetId}, action)
-  const attackBundle = calcAttack(state, attack)
-  const {notification, wound} = attackBundle
-  const wounds = R.isNil(wound) ? currentWounds : R.append(wound, currentWounds);
-  const health = deriveHealth(maxHealth, wounds)
-  const status = deriveStatus(health)
-  const woundFunc = R.isNil(wound) ? R.identity : R.append(wound)
+  const targetOfTargetId = R.path(['actors', target, 'target'], state);
+  const attack = R.mergeLeft({ targetOfTargetId }, action);
+  const attackBundle = calcAttack(state, attack);
+  const { notification, wound } = attackBundle;
+  const wounds = R.isNil(wound)
+    ? currentWounds
+    : R.append(wound, currentWounds);
+  const health = deriveHealth(maxHealth, wounds);
+  const status = deriveStatus(health);
+  const woundFunc = R.isNil(wound) ? R.identity : R.append(wound);
+  const notify = R.isNil(notification) ? R.identity : R.append(notification);
   return R.pipe(
-    R.over(
-    woundsLens(target),
-    R.pipe(R.defaultTo([]), woundFunc)
-  ),
-  R.over(actorLens(target), R.assoc('status', status)))
-  (state);
+    R.over(woundsLens(target), R.pipe(R.defaultTo([]), woundFunc)),
+    R.over(notifyLens, R.pipe(R.defaultTo([]), notify)),
+    R.over(actorLens(target), R.assoc('status', status))
+  )(state);
 };
 
 const handleHeal = (state, action) => {
-const {target} = action
-const currentWounds = R.pathOr([], ['actors', target, 'wounds'], state);
-const byAmount = R.descend(R.prop('amount'))
-const woundSort = R.sort(byAmount, currentWounds)
-const wounds = R.drop(1, woundSort)
-return R.over(woundsLens(target), R.always(wounds), state)
-
-}
+  const { target } = action;
+  const currentWounds = R.pathOr([], ['actors', target, 'wounds'], state);
+  const byAmount = R.descend(R.prop('amount'));
+  const woundSort = R.sort(byAmount, currentWounds);
+  const wounds = R.drop(1, woundSort);
+  return R.over(woundsLens(target), R.always(wounds), state);
+};
 
 const reduceAttack = (state) =>
   R.reduce(handleAttack, state, getAttacks(R.prop('effectiveMoves', state)));
@@ -54,17 +54,17 @@ const reduceHeal = (state) =>
 
 const reduceContext = R.pipe(reduceAttack, reduceHeal);
 const reduceObject = (index, id, value) => {
-  return (
-  {
-    ...value[id], actorId: id
-  })
-}
-const arrayWithIdsFromObject = R.pipe(
-  R.mapObjIndexed(reduceObject),
-  R.values
-  )
+  return {
+    ...value[id],
+    actorId: id,
+  };
+};
+const arrayWithIdsFromObject = R.pipe(R.mapObjIndexed(reduceObject), R.values);
 const addEffectiveMove = (ticMoves) =>
-  R.over(R.lensProp('effectiveMoves'), R.concat(arrayWithIdsFromObject(ticMoves)));
+  R.over(
+    R.lensProp('effectiveMoves'),
+    R.concat(arrayWithIdsFromObject(ticMoves))
+  );
 
 const clearEffectiveMoves = R.assoc('effectiveMoves', []);
 
@@ -140,21 +140,22 @@ const disableDeadActors = (state) => {
 };
 
 const persistActors = (state) => {
-  const actors = R.prop('actors', state)
-  const db = R.prop('db', state)
-  setActors(db, actors)
-  return state
-}
+  const actors = R.prop('actors', state);
+  const db = R.prop('db', state);
+  setActors(db, actors);
+  return state;
+};
 
 const reduceMoves = R.curry((ticMoves, currentTic, state) =>
   R.pipe(
     addEffectiveMove(ticMoves),
     clearPlannedMoves(ticMoves),
     reduceContext,
+    R.tap(R.pipe(R.prop('notifications',),console.log)),
     clearEffectiveMoves,
     disableDeadActors,
     planAIMoves(currentTic),
-    persistActors,
+    persistActors
   )(state)
 );
 
@@ -171,8 +172,8 @@ function turn(state, action) {
 const setMove = (state, action) => {
   const { actor, currentAction } = action;
   const db = R.prop('db', state);
-  updateActor(db, actor, {currentAction})
-  return state
+  updateActor(db, actor, { currentAction });
+  return state;
 };
 
 const setPlannedMove = (state, action) => {
@@ -186,8 +187,8 @@ const setPlannedMove = (state, action) => {
 const setTarget = (state, action) => {
   const { target, actor } = action;
   const db = R.prop('db', state);
-  updateActor(db, actor, {target})
-  return R.dissocPath(['actors', actor, 'isTargeting'], state)
+  updateActor(db, actor, { target });
+  return R.dissocPath(['actors', actor, 'isTargeting'], state);
 };
 
 const beginTargeting = (state, action) => {
