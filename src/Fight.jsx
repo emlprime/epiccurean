@@ -1,42 +1,40 @@
-import React, { useReducer, useCallback, useEffect, useState } from 'react';
-import * as R from 'ramda';
-import styled from 'styled-components';
-import Profile from './Profile';
-import Character from './Character';
-import CurrentCharacter from './CurrentCharacter';
-import ActionStatus from './ActionStatus';
-import AI from './AI';
-import Loop from './Loop';
-import moveReducer from './gameLoop';
-import { selectActionStatus } from './selectActionStatus';
-import { getCharacterIds, getAIIds } from './getIds';
+import React, {useReducer, useCallback, useEffect, useState} from "react";
+import * as R from "ramda";
+import styled from "styled-components";
+import Profile from "./Profile";
+import Character from "./Character";
+import CurrentCharacter from "./CurrentCharacter";
+import ActionStatus from "./ActionStatus";
+import AI from "./AI";
+import Loop from "./Loop";
+import moveReducer from "./gameLoop";
+import {selectActionStatus} from "./selectActionStatus";
+import {getCharacterIds, getAIIds} from "./getIds";
 import {
   livingPlayersFromStateLens,
   availableLivingPlayers,
   getCurrentPlayer,
-} from './actorSelectors';
-import { GiHumanTarget } from '@react-icons/all-files/gi/GiHumanTarget';
-import { watchActors } from './getActors';
-import useTimeout from 'use-timeout'
-import { resetActors } from './resetActors';
-
+} from "./actorSelectors";
+import {GiHumanTarget} from "@react-icons/all-files/gi/GiHumanTarget";
+import {watchActors} from "./getActors";
+import {resetActors} from "./resetActors";
 
 const initialState = {
   actors: {},
   characterRoster: [],
   plannedMoves: {},
   effectiveMoves: [],
-  notifications: []
+  notifications: [],
 };
 
-export default function Fight({ db }) {
+export default function Fight({db}) {
   const [state, dispatch] = useReducer(
     moveReducer,
-    R.assoc('db', db, initialState)
+    R.assoc("db", db, initialState),
   );
   // this triggers the reducer case of "take turn"
   const onChangeActors = (actors) => {
-    dispatch({ type: 'UPDATE_ACTORS', actors });
+    dispatch({type: "UPDATE_ACTORS", actors});
   };
 
   useEffect(() => watchActors(db, onChangeActors), []);
@@ -46,16 +44,15 @@ export default function Fight({ db }) {
   const currentPlayer = getCurrentPlayer(players);
   const takeTurn = useCallback(
     (tic) => {
-      dispatch({ type: 'Take Turn', tic });
+      dispatch({type: "Take Turn", tic});
       setCurrentTic(tic);
     },
-    [dispatch]
+    [dispatch],
   );
 
-  const currentPlayerId = R.prop('id', currentPlayer);
-  const needTarget = R.path(['actors', currentPlayerId, 'isTargeting'], state);
-  useTimeout(() => {console.log('timeOut')}, 2000)
-  const notification = R.head(R.prop('notifications', state))
+  const currentPlayerId = R.prop("id", currentPlayer);
+  const needTarget = R.path(["actors", currentPlayerId, "isTargeting"], state);
+  const notification = R.head(R.prop("notifications", state));
   return (
     <Style>
       <header>
@@ -69,7 +66,7 @@ export default function Fight({ db }) {
               <Character
                 key={id}
                 id={id}
-                isCurrent={R.equals(id, R.prop('id', currentPlayer))}
+                isCurrent={R.equals(id, R.prop("id", currentPlayer))}
                 color="blue"
                 state={state}
                 dispatch={dispatch}
@@ -81,7 +78,7 @@ export default function Fight({ db }) {
                       dispatch({
                         target: id,
                         actor: currentPlayerId,
-                        type: 'setTarget',
+                        type: "setTarget",
                       })
                     }
                   >
@@ -90,7 +87,7 @@ export default function Fight({ db }) {
                 )}
               </Character>
             ),
-            getCharacterIds(state)
+            getCharacterIds(state),
           )}
         </Profile>
         <div>{notification}</div>
@@ -110,7 +107,7 @@ export default function Fight({ db }) {
                       dispatch({
                         target: id,
                         actor: currentPlayerId,
-                        type: 'setTarget',
+                        type: "setTarget",
                       })
                     }
                   >
@@ -119,17 +116,18 @@ export default function Fight({ db }) {
                 )}
               </AI>
             ),
-            getAIIds(state)
+            getAIIds(state),
           )}
         </Profile>
       </section>
-      {currentPlayer &&
-      <CurrentCharacter
-      currentPlayer = {currentPlayer}
-      state={state}
-      dispatch = {dispatch}
-      currentTic = {currentTic}
-      />}
+      {currentPlayer && (
+        <CurrentCharacter
+          currentPlayer={currentPlayer}
+          state={state}
+          dispatch={dispatch}
+          currentTic={currentTic}
+        />
+      )}
     </Style>
   );
 }
