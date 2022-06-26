@@ -18,6 +18,7 @@ import {
 import {GiHumanTarget} from "@react-icons/all-files/gi/GiHumanTarget";
 import {watchActors} from "./getActors";
 import {resetActors} from "./resetActors";
+import useInterval from "use-interval";
 
 const initialState = {
   actors: {},
@@ -53,6 +54,11 @@ export default function Fight({db}) {
   const currentPlayerId = R.prop("id", currentPlayer);
   const needTarget = R.path(["actors", currentPlayerId, "isTargeting"], state);
   const notification = R.head(R.prop("notifications", state));
+  useInterval(() => {
+    if (notification) {
+      dispatch({type: "Clear Notification"});
+    }
+  }, 2000);
   return (
     <Style>
       <header>

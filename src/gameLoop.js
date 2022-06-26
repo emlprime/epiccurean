@@ -204,6 +204,11 @@ const updateActors = (state, action) => {
   )(state);
 };
 
+const clearNotification = (state, action) => {
+  const notificationLens = R.lensProp("notifications");
+  return R.over(notificationLens, R.drop(1), state);
+};
+
 export default function moveReducer(state, action) {
   const {type} = action;
   switch (type) {
@@ -221,6 +226,9 @@ export default function moveReducer(state, action) {
     //  calls turn on a tic - action contains type and tic, state is updated each iteration
     case "Take Turn":
       return turn(state, action);
+    case "Clear Notification":
+      return clearNotification(state, action);
+
     default:
       return state;
   }
