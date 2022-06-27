@@ -25,26 +25,24 @@ const deriveWoundAmount = (hitBundle) => {
 
 const deriveWound = (hitBundle) => {
   const woundAmountBundle = deriveWoundAmount(hitBundle);
-  const wound = {
-    actorId: R.prop('actorId', hitBundle),
-    target: R.prop('target', hitBundle),
-    location: R.prop('bodyPart', hitBundle),
-    attackType: 'stabbed',
-    amount: R.prop('amount', woundAmountBundle),
-    effect: 'bleeding',
-  };
+  const wound = R.mergeLeft(
+    R.applySpec({
+      actorId: R.prop('actorId'),
+      target: R.prop('target'),
+      location: R.prop('bodyPart'),
+      attackType: R.prop('attackType'),
+    })(hitBundle),
+    { amount: R.prop('amount', woundAmountBundle), effect: 'bleeding' }
+  );
   return { wound, woundAmountBundle };
 };
 
 const deriveWoundNotification = (state, woundBundle) => {
   const {
-    wound: { amount, attackType, location, effect },
+    wound: { target, actorId, amount, attackType, location, effect },
   } = woundBundle;
-  const targetId = R.path(['wound', 'target'], woundBundle)
-  const targetName = R.path(['actors', targetId, 'name'], state)
-  const actorId = R.path(['wound', 'actorId'], woundBundle)
-  const actorName = R.path(['actors', actorId, 'name'], state)
-  console.log(actorName)
+  const targetName = R.path(['actors', target, 'name'], state);
+  const actorName = R.path(['actors', actorId, 'name'], state);
   return `${targetName} got ${deriveDamageAdjective(
     amount
   )} ${attackType} in the ${location} by ${actorName} and is now ${effect}`;

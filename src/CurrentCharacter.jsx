@@ -52,7 +52,7 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
           onClick={() =>
             dispatch({
               type: 'setMove',
-              currentAction: 'stabby',
+              currentAction: 'stabbed',
               actor: id,
               target: targetId,
               currentTic,

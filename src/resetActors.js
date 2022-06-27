@@ -5,7 +5,7 @@ const actors = {
   '0vN9omexae7Er3Vykqy4': {
     type: 'AI',
     speed: 10,
-    currentAction: 'scratch',
+    currentAction: 'scratched',
     name: 'Frank',
     maxHealth: 100,
     status: 'ALIVE',
@@ -23,7 +23,7 @@ const actors = {
     speed: 10,
     status: 'ALIVE',
     type: 'AI',
-    currentAction: 'scrappin',
+    currentAction: 'scrapped',
   },
   Q1Q4lkNnhgos7Tge9kL3: {
     name: 'Doggo',
@@ -43,7 +43,7 @@ const actors = {
     status: 'ALIVE',
     maxHealth: 100,
     name: 'Eeeevil',
-    currentAction: 'stabby',
+    currentAction: 'stabbed',
     type: 'AI',
     speed: 12,
   },
