@@ -57,6 +57,10 @@ const deriveDamageAdjective = R.cond([
 
 export const calcAttack = (state, attack) => {
   const hitBundle = didYouGetHitDynamic(attack);
+  const actorId = R.prop('actorId', hitBundle)
+  const actorName= R.path(['actors', actorId, 'name'], state)
+  const targetId = R.prop('target', hitBundle)
+  const targetName = R.path(['actors', targetId, 'name'], state)
   if (R.prop('result', hitBundle)) {
     const woundBundle = deriveWound(hitBundle);
     const wound = R.prop('wound', woundBundle);
@@ -66,7 +70,7 @@ export const calcAttack = (state, attack) => {
       wound,
     };
   }
-  return { hitBundle, notification: 'womp womp' };
+  return { hitBundle, notification: `${actorName} swung at ${targetName} and missed. What a loser.` };
 };
 
 const deriveBodyPart = (attack) =>
