@@ -92,13 +92,14 @@ const firstLivingCharacter = (state) => {
 
 const planAction = (state, currentTic, id) => {
   const currentAction = R.path(['actors', id, 'currentAction'], state);
+  const speed = R.path(['actors', id, 'speed'], state)
   const { type, amount, planOffset } = R.propOr(
     {},
     currentAction,
     knownActions
   );
-  const plannedFor = planOffset + currentTic;
-  return { attackType: currentAction, type, amount, plannedFor };
+  const plannedFor = planOffset + currentTic - Math.ceil(speed/5);
+  return { attackType: currentAction, type, amount, plannedFor, plannedAt: currentTic };
 };
 
 const getAIAction = (state, currentTic, id) => {

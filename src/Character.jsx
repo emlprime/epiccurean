@@ -17,6 +17,8 @@ export default function Character({
   children,
 }) {
   const actor = R.path(['actors', id], state);
+  const plannedFor = R.path(['plannedMoves', id, 'plannedFor'], state)
+  const plannedAt = R.path(['plannedMoves', id, 'plannedAt'], state)
   const {
     wounds = [],
     maxHealth,
@@ -26,7 +28,6 @@ export default function Character({
     currentAction,
   } = actor;
   const health = deriveHealth(maxHealth, wounds);
- 
   return (
     <Style>
       <div>{name}</div>
@@ -34,6 +35,11 @@ export default function Character({
         bgColor={color}
         completed={health}
         maxCompleted={maxHealth}
+      />
+      <ProgressBar
+      completed={R.toString(plannedFor-currentTic)}
+      maxCompleted={plannedFor-plannedAt}
+      customLabel = " "
       />
       <div>{currentAction}</div>
       {children}
