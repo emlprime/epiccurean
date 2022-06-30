@@ -1,22 +1,52 @@
-import React from 'react'
-import Highcharts from 'highcharts'
-import HighchartsReact from 'highcharts-react-official'
+import React from 'react';
+import * as R from 'ramda';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
-
-const options = {
+const config = {
   title: {
-    text: 'My chart'
+    text: 'Fight',
   },
-  series: [{
-    data: [1, 2, 3]
-  }]
-}
+  chart: { type: 'column' },
+  plotOptions: {
+    column: {
+      stacking: 'normal',
+    },
+  },
+};
+const knownColors = { luck: 'lightgreen', skill: 'darkgreen', strength: 'purple', size: 'orange' };
 
-const Chart = () => <div>
-  <HighchartsReact
-    highcharts={Highcharts}
-    options={options}
-  />
-</div>
+const deriveStat = R.curry((actor, stat, results) => {
+  return {
+    name: `${actor} ${stat}`,
+    data: [R.path([actor, stat], results)],
+    stack: actor,
+    color: R.prop(stat, knownColors),
+  };
+});
 
-export default Chart
+const attackerStats = ['luck', 'skill', 'strength'];
+const defenderStats = ['luck', 'skill', 'size'];
+
+const generateSeries = () => {
+  const results = {
+    attacker: { luck: 5, skill: 8, strength: 10 },
+    defender: { luck: 3, skill: 5, size: 20},
+  };
+  const series = [
+    ...R.map(deriveStat('attacker', R.__, results), attackerStats),
+    ...R.map(deriveStat('defender', R.__, results), defenderStats),
+  ];
+  return series;
+};
+
+const options = R.assoc('series', generateSeries(), config);
+console.log(options);
+
+const Chart = () => (
+  <div>
+    <HighchartsReact highcharts={Highcharts} options={options} />
+  </div>
+);
+
+export default Chart;
