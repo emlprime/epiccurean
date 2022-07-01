@@ -17,7 +17,7 @@ const calcInfluence = R.curry(
   R.clamp(0, 100, 
     R.add(R.clamp(0, skillCap, skill), R.clamp(0, luckCap, luck))
        )
-)
+) 
 
 const attacker = {
   str: 50,
