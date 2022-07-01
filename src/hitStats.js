@@ -8,6 +8,7 @@ const defender = {
   armor: {mass: 5, flexibility: 15},
   volume: 20,
 }
+const foo = "stuff"
 
 const calcFactor = R.curry((luckGap, luck, normalizedStat) => {})
 
@@ -40,8 +41,7 @@ const getBaseMobility = R.converge(R.subtract, [R.always(100), getMobilityRatio]
 const deriveAgilityInfluence = R.pipe(getBaseMobility, calcAgilityInfluence)
 
 
-const hitMatrix = R.applySpec({
-  reach: deriveReachInfluence,
+const hitMatrix = R.applySpec({reach: deriveReachInfluence,
   agility: deriveAgilityInfluence
 })(attacker)
 
