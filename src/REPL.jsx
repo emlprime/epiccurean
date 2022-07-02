@@ -54,8 +54,8 @@ const REPL = () => {
 
   return (
     <article>
-      <pre>{JSON.stringify(R.last(results), null, 2)}</pre>;
-      <Chart />;
+      <pre>{JSON.stringify(R.last(results), null, 2)}</pre>
+      <Chart />
     </article>
   );
 };
