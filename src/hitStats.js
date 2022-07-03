@@ -33,6 +33,13 @@ const getMobilityRatio = R.pipe(
   R.subtract(100)
 );
 const getReachRatio = R.converge(R.add, [getRadius, getWeaponLength]);
+const getWeaponPenetration = R.pipe(
+  R.converge(R.divide, [
+    R.pathOr(0, ['weapon', 'mass']),
+    R.pathOr(100, ['weapon', 'pointWidth']),
+  ]),
+  Math.round
+);
 
 // Influence Derivers
 //  Hit Influences
@@ -40,27 +47,33 @@ const deriveReachInfluence = deriveComplexInfluence(90, 60, getReachRatio);
 const deriveAgilityInfluence = deriveComplexInfluence(95, 30, getMobilityRatio);
 const deriveTargetingInfluence = deriveInfluence(95, 20, 'attention');
 const deriveVisibilityInfluence = deriveInfluence(95, 20, 'vision');
-const deriveCoverInfluence = deriveInfluence(70, 60, 'cover');
+const derivePenetrationInfluence = deriveComplexInfluence(
+  95,
+  60,
+  getWeaponPenetration
+);
 const deriveElevationInfluence = deriveInfluence(100, 0, 'elevation');
 
 //  Dodge Influences
 const deriveSizeInfluence = deriveInvertedInfluence(100, 0, 'volume');
 const deriveEvasionInfluence = deriveInfluence(95, 20, 'reflex');
 const deriveStanceInfluence = deriveInvertedInfluence(100, 0, 'silouhette');
+const deriveOpacityInfluence = deriveInfluence(100, 0, 'opacity');
+const deriveCoverInfluence = deriveInfluence(70, 60, 'cover');
 
 export const calcHitMatrix = R.applySpec({
   reach: deriveReachInfluence,
   agility: deriveAgilityInfluence,
   targeting: deriveTargetingInfluence,
   visibility: deriveVisibilityInfluence,
-  cover: deriveCoverInfluence,
+  cover: derivePenetrationInfluence,
   elevation: deriveElevationInfluence,
 });
 export const calcDodgeMatrix = R.applySpec({
   reach: deriveSizeInfluence,
   agility: deriveEvasionInfluence,
   targeting: deriveStanceInfluence,
-  visibility: deriveVisibilityInfluence,
+  visibility: deriveOpacityInfluence,
   cover: deriveCoverInfluence,
   elevation: deriveElevationInfluence,
 });

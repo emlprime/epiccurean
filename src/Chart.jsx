@@ -42,7 +42,13 @@ const attacker = {
   attention: 14,
   vision: 10,
   cover: 3,
-  weapon: { length: 5, mass: 2000, complexity: 5, name: 'bo staff' },
+  weapon: {
+    length: 5,
+    mass: 2000,
+    pointWidth: 100,
+    complexity: 5,
+    name: 'bo staff',
+  },
   elevation: 20,
 };
 const defender = {
@@ -56,6 +62,7 @@ const defender = {
   cover: 3,
   reflex: 50,
   silouhette: 80,
+  opactity: 100,
   weapon: { mass: 1000, flexibility: 15 },
   volume: 20,
   elevation: 10,
