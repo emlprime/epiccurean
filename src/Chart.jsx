@@ -60,6 +60,7 @@ const defender = {
 };
 const attackerHitMatrix = calcHitMatrix(attacker);
 const defenderHitMatrix = calcHitMatrix(defender);
+console.log({ attackerHitMatrix, defenderHitMatrix });
 const categories = [
   'reach',
   'agility',

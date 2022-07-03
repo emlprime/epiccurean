@@ -21,6 +21,11 @@ const getMobilityRatio = R.pipe(
   R.converge(R.divide, [R.pathOr(0, ['weapon', 'mass']), R.propOr(1, 'str')]),
   Math.round
 );
+
+const getBaseAttribute = R.curry((key) => R.pipe(R.propOr(0, key)));
+const deriveInfluence = R.curry((skillCap, luckCap, attr) =>
+  R.pipe(getBaseAttribute(attr), calcInfluence(skillCap, luckCap))
+)
 const getBaseReach = R.converge(R.add, [getRadius, getWeaponLength]);
 
 const calcReachInfluence = calcInfluence(90, 60);
@@ -40,12 +45,7 @@ const deriveTargetingInfluence = R.pipe(
   calcTargetingInfluence
 );
 
-const getBaseVisibility = R.pipe(R.propOr(0, 'vision'));
-const calcVisibilityInfluence = calcInfluence(95, 20);
-const deriveVisibilityInfluence = R.pipe(
-  getBaseVisibility,
-  calcVisibilityInfluence
-);
+const deriveVisibilityInfluence = deriveInfluence(95, 20, 'vision');
 
 const getBaseCover = R.pipe(R.propOr(0, 'cover'));
 const calcCoverInfluence = calcInfluence(70, 60);
