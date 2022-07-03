@@ -3,6 +3,7 @@ import * as R from 'ramda';
 import styled from 'styled-components';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase/compat/app';
+
 import 'firebase/compat/auth';
 import {
   collection,
@@ -13,9 +14,8 @@ import {
 } from 'firebase/firestore';
 import './style.css';
 import Fight from './Fight';
-import Game from "./Game"
+import Game from './Game';
 import { getCurrentUser } from './CurrentUser';
-
 
 // Configure Firebase.
 //TODO remove api key from github
@@ -75,7 +75,7 @@ function App() {
           </button>
         </div>
       </header>
-<Game db={db}/>
+      <Game db={db} />
     </Style>
   );
 }
