@@ -2,7 +2,7 @@ import React from 'react';
 import * as R from 'ramda';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
-import { calcHitMatrix } from './hitStats';
+import { calcHitMatrix, calcDodgeMatrix } from './hitStats';
 
 const config = {
   title: {
@@ -54,12 +54,14 @@ const defender = {
   attention: 3,
   vision: 10,
   cover: 3,
+  reflex: 50,
+  silouhette: 80,
   weapon: { mass: 1000, flexibility: 15 },
   volume: 20,
   elevation: 10,
 };
 const attackerHitMatrix = calcHitMatrix(attacker);
-const defenderHitMatrix = calcHitMatrix(defender);
+const defenderHitMatrix = calcDodgeMatrix(defender);
 console.log({ attackerHitMatrix, defenderHitMatrix });
 const categories = [
   'reach',
