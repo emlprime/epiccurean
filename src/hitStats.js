@@ -22,6 +22,7 @@ const deriveInvertedInfluence = R.curry((name, skillCap, luckCap, attr) =>
     calcInfluence(name, skillCap, luckCap)
   )
 );
+
 const deriveComplexInfluence = R.curry(
   (name, skillCap, luckCap, attrSelector) =>
     R.pipe(attrSelector, calcInfluence(name, skillCap, luckCap))
