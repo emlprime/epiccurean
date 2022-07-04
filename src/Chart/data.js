@@ -1,0 +1,33 @@
+export const attacker = {
+  str: 50,
+  dex: 10,
+  mass: 20,
+  height: 75,
+  attention: 14,
+  vision: 10,
+  cover: 3,
+  weapon: {
+    length: 5,
+    mass: 2000,
+    pointWidth: 100,
+    complexity: 5,
+    name: 'bo staff',
+  },
+  elevation: 20,
+};
+export const defender = {
+  speed: 5,
+  dex: 10,
+  mass: 10,
+  height: 60,
+  str: 20,
+  attention: 3,
+  vision: 10,
+  cover: 3,
+  reflex: 50,
+  silouhette: 80,
+  opacity: 90,
+  weapon: { mass: 1000, flexibility: 15 },
+  volume: 20,
+  elevation: 10,
+};

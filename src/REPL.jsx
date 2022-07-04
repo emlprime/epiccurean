@@ -1,6 +1,6 @@
 import React from 'react';
 import * as R from 'ramda';
-import Chart from './Chart';
+import { Chart } from './Chart';
 
 const MIN = 1;
 const MAX = 6;
