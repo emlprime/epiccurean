@@ -10,27 +10,38 @@ const MAX = 6;
 const rolls = R.range(MIN, R.inc(MAX));
 const validRoll = R.clamp(MIN, MAX);
 
+const evalCategoricalResult = R.curry((match, category) =>
+  R.converge(R.gt, [
+    R.path([0, category, 'result']),
+    R.path([1, category, 'result']),
+  ])(match)
+);
+
 const matchupResolver = (acc, match) => {
-  console.log('match', match);
-  return acc;
+  const result = R.map(evalCategoricalResult(match), categories)
+  const successes = R.filter(R.identity, result)
+  console.log(successes)
+
+  return result ? R.inc(acc) : acc;
 };
 
-const evalMatchupResult = reduce(matchupResolver, 0);
+const calcAttackerResult = R.pipe(calcHitMatrix, R.applySpec)(attacker);
+const calcDefenderResult = R.pipe(calcDodgeMatrix, R.applySpec)(defender);
 
-const matchup = R.pipe(
-  R.converge(R.xprod, [
-    R.map(R.pipe(calcHitMatrix, R.applySpec)(attacker)),
-    R.map(R.pipe(calcDodgeMatrix, R.applySpec)(defender)),
-  ]),
+const evalMatchupResult = R.reduce(matchupResolver, 0);
+const matchupSuccesses = R.pipe(
+  R.converge(R.xprod, [R.map(calcAttackerResult), R.map(calcDefenderResult)]),
   evalMatchupResult
 )(rolls);
+const matchupRounds = R.length(rolls);
 
-const matchupLength = R.length(matchup);
-const result = { true: 12 };
-const percent = R.pipe(R.divide(result['true']), R.multiply(100), (num) =>
+const percent = R.pipe(R.divide(matchupSuccesses), R.multiply(100), (num) =>
   Math.round(num)
-)(matchupLength);
-const report = `After ${matchupLength} attempts Bob hits ${percent}%`;
+)(matchupRounds);
+const report = `After ${matchupRounds} attempts Bob hits ${percent}%`;
+
+const attackerStats = calcAttackerResult(1);
+const defenderStats = calcDefenderResult(1);
 
 const REPL = () => {
   const results = [report];
