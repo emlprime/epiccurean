@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import * as R from 'ramda';
 import REPL from './REPL';
 import Fight from './Fight';
-import Chart from './Chart'
+import Chart from './Chart';
 
 const Game = ({ db }) => {
-  const [tab, setTab] = useState('REPL');
+  const [tab, setTab] = useState('FIGHT');
   return (
     <>
       <article>
