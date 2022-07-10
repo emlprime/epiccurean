@@ -11,14 +11,14 @@ export default function Character({
   id,
   color,
   state,
-  dispatch,
   isCurrent,
+  setCurrentActorId,
   currentTic,
   children,
 }) {
   const actor = R.path(['actors', id], state);
-  const plannedFor = R.path(['plannedMoves', id, 'plannedFor'], state)
-  const plannedAt = R.path(['plannedMoves', id, 'plannedAt'], state)
+  const plannedFor = R.path(['plannedMoves', id, 'plannedFor'], state);
+  const plannedAt = R.path(['plannedMoves', id, 'plannedAt'], state);
   const {
     wounds = [],
     maxHealth,
@@ -30,16 +30,18 @@ export default function Character({
   const health = deriveHealth(maxHealth, wounds);
   return (
     <Style>
-      <div>{name}</div>
+      <button onClick={() => setCurrentActorId(id)} disabled={isCurrent}>
+        {name}
+      </button>
       <ProgressBar
         bgColor={color}
         completed={health}
         maxCompleted={maxHealth}
       />
       <ProgressBar
-      completed={R.toString(plannedFor-currentTic)}
-      maxCompleted={plannedFor-plannedAt}
-      customLabel = " "
+        completed={R.toString(plannedFor - currentTic)}
+        maxCompleted={plannedFor - plannedAt}
+        customLabel=" "
       />
       <div>{currentAction}</div>
       {children}

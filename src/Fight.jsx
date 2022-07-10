@@ -32,7 +32,6 @@ export default function Fight({ db }) {
 
   // this triggers the reducer case of "take turn"
   const onChangeActors = (actors) => {
-    console.log({ actors });
     dispatch({ type: 'UPDATE_ACTORS', actors });
   };
 
@@ -73,9 +72,9 @@ export default function Fight({ db }) {
                 key={id}
                 id={id}
                 isCurrent={R.equals(id, currentActorId)}
+                setCurrentActorId={setCurrentActorId}
                 color="blue"
                 state={state}
-                dispatch={dispatch}
                 currentTic={currentTic}
               >
                 {needTarget && (

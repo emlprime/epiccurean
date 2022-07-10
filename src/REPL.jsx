@@ -18,9 +18,8 @@ const evalCategoricalResult = R.curry((match, category) =>
 );
 
 const matchupResolver = (acc, match) => {
-  const result = R.map(evalCategoricalResult(match), categories)
-  const successes = R.filter(R.identity, result)
-  console.log(successes)
+  const result = R.map(evalCategoricalResult(match), categories);
+  const successes = R.filter(R.identity, result);
 
   return result ? R.inc(acc) : acc;
 };
