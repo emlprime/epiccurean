@@ -13,25 +13,34 @@ const deriveStatus = R.pipe(
   R.map(R.pipe(R.pluck(['amount']), R.sum))
 );
 
-const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
-  const name = R.prop('name', currentPlayer);
-  const targetId = R.prop('target', currentPlayer);
-  const targetName = R.path(['actors', targetId, 'name'], state);
-  const id = R.prop('id', currentPlayer);
-  const isTargeting = R.prop('isTargeting', currentPlayer);
-  const disableTarget = !canPlanMove(id, state) || isTargeting;
-  const currentAction = R.prop('currentAction', currentPlayer);
+const CurrentCharacter = ({
+  currentActorId: actorId,
+  state,
+  dispatch,
+  currentTic,
+}) => {
+  const {
+    name,
+    target: targetId,
+    currentAction,
+    wounds: actorWounds = [],
+    isTargeting = false,
+  } = R.path(['actors', actorId], state);
+  const { name: targetName, wounds: targetWounds = [] } = R.pathOr(
+    {},
+    ['actors', targetId],
+    state
+  );
+  const disableTarget = !canPlanMove(actorId, state) || isTargeting;
   const disableAttack = disableTarget || R.isNil(targetId);
   const disableDone = disableAttack || R.isNil(currentAction);
-  const playerWounds = R.propOr([], 'wounds', currentPlayer);
-  const targetWounds = R.pathOr([], ['actors', targetId, 'wounds'], state);
-  const playerStatuses = deriveStatus(playerWounds);
+  const actorStatuses = deriveStatus(actorWounds);
   const targetStatuses = deriveStatus(targetWounds);
   return (
     <Style>
-      <div id="playername">{name} </div>
-      <div id="playerstatus">
-        <ActorStatus statuses={playerStatuses} />
+      <div id="actorname">{name} </div>
+      <div id="actorstatus">
+        <ActorStatus statuses={actorStatuses} />
       </div>
       <div id="buttons">
         <button
@@ -40,7 +49,7 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
           onClick={() =>
             dispatch({
               type: 'beginTargeting',
-              actor: id,
+              actor: actorId,
             })
           }
         >
@@ -53,7 +62,7 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
             dispatch({
               type: 'setMove',
               currentAction: 'stabbed',
-              actor: id,
+              actor: actorId,
               target: targetId,
               currentTic,
             })
@@ -68,7 +77,7 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
             dispatch({
               type: 'setMove',
               currentAction: 'lifegiver',
-              actor: id,
+              actor: actorId,
               target: targetId,
               currentTic,
             })
@@ -82,7 +91,7 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
           onClick={() =>
             dispatch({
               type: 'setPlannedMove',
-              actor: id,
+              actor: actorId,
               currentTic,
             })
           }
@@ -104,13 +113,13 @@ const CurrentCharacter = ({ currentPlayer, state, dispatch, currentTic }) => {
 
 export default CurrentCharacter;
 
-//<pre>{JSON.stringify(currentPlayer, null, 2)}</pre>
+//<pre>{JSON.stringify(currentActorId, null, 2)}</pre>
 
 const Style = style.section`
 width: 100%;
 height: 300px;
 display: grid;
-grid-template: 'playername . targetname' 80px 'playerstatus buttons targetstatus' 1fr / 1fr 50px 1fr;
+grid-template: 'actorname . targetname' 80px 'actorstatus buttons targetstatus' 1fr / 1fr 50px 1fr;
 > div > svg {
   height: 150px;
 }
@@ -120,14 +129,14 @@ grid-template: 'playername . targetname' 80px 'playerstatus buttons targetstatus
   grid-area: targetstatus;
 
 }
-#playerstatus{
+#actorstatus{
   height: 50%;
   width: 50%;
-  grid-area: playerstatus;
+  grid-area: actorstatus;
 
 }
-#playername{
-  grid-area: playername;
+#actorname{
+  grid-area: actorname;
 }
 #targetname{
   grid-area: targetname;
