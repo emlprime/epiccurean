@@ -15,21 +15,11 @@ import { GiHumanTarget } from '@react-icons/all-files/gi/GiHumanTarget';
 import { watchActors } from './getActors';
 import { resetActors } from './resetActors';
 import useInterval from 'use-interval';
-
-const initialState = {
-  actors: {},
-  characterRoster: [],
-  plannedMoves: {},
-  effectiveMoves: [],
-  notifications: [],
-};
+import { useWorld } from './useWorld';
 
 export default function Fight({ db }) {
-  const [state, dispatch] = useReducer(
-    moveReducer,
-    R.assoc('db', db, initialState)
-  );
-
+  const { stateControl } = useWorld(db);
+  const [state, dispatch] = stateControl;
   // this triggers the reducer case of "take turn"
   const onChangeActors = (actors) => {
     dispatch({ type: 'UPDATE_ACTORS', actors });
