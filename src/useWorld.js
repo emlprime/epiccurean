@@ -10,9 +10,19 @@ const initialState = {
   notifications: [],
 };
 
-export const useWorld = (db) => {
+export const useWorld = (db, tic) => {
   const stateControl = useReducer(moveReducer, R.assoc('db', db, initialState));
   const [state, dispatch] = stateControl;
 
-  return { stateControl };
+  const setTarget = R.curry((actorId, targetId) =>
+    dispatch({
+      target: targetId,
+      actor: actorId,
+      type: 'setTarget',
+    })
+  );
+
+  const nextTurn = () => dispatch({ type: 'Take Turn', tic });
+
+  return { stateControl, setTarget, nextTurn };
 };

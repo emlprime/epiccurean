@@ -18,7 +18,8 @@ import useInterval from 'use-interval';
 import { useWorld } from './useWorld';
 
 export default function Fight({ db }) {
-  const { stateControl } = useWorld(db);
+  const [currentTic, setCurrentTic] = useState(0);
+  const { stateControl, setTarget, nextTurn } = useWorld(db, currentTic);
   const [state, dispatch] = stateControl;
   // this triggers the reducer case of "take turn"
   const onChangeActors = (actors) => {
@@ -31,15 +32,13 @@ export default function Fight({ db }) {
 
   useEffect(() => watchActors(db, onChangeActors), []);
 
-  const [currentTic, setCurrentTic] = useState(0);
   const takeTurn = useCallback(
     (tic) => {
-      dispatch({ type: 'Take Turn', tic });
+      nextTurn();
       setCurrentTic(tic);
     },
     [dispatch]
   );
-
   const needTarget = R.path(['actors', currentActorId, 'isTargeting'], state);
   const notification = R.head(R.prop('notifications', state));
   useInterval(() => {
@@ -68,15 +67,7 @@ export default function Fight({ db }) {
                 currentTic={currentTic}
               >
                 {needTarget && (
-                  <button
-                    onClick={() =>
-                      dispatch({
-                        target: id,
-                        actor: currentActorId,
-                        type: 'setTarget',
-                      })
-                    }
-                  >
+                  <button onClick={() => setTarget(currentActorId, id)}>
                     <GiHumanTarget />
                   </button>
                 )}
@@ -97,15 +88,7 @@ export default function Fight({ db }) {
                 currentTic={currentTic}
               >
                 {needTarget && (
-                  <button
-                    onClick={() =>
-                      dispatch({
-                        target: id,
-                        actor: currentActorId,
-                        type: 'setTarget',
-                      })
-                    }
-                  >
+                  <button onClick={() => setTarget(currentActorId, id)}>
                     <GiHumanTarget />
                   </button>
                 )}

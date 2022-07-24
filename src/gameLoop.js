@@ -92,14 +92,20 @@ const firstLivingCharacter = (state) => {
 
 const planAction = (state, currentTic, id) => {
   const currentAction = R.path(['actors', id, 'currentAction'], state);
-  const speed = R.path(['actors', id, 'speed'], state)
+  const speed = R.path(['actors', id, 'speed'], state);
   const { type, amount, planOffset } = R.propOr(
     {},
     currentAction,
     knownActions
   );
-  const plannedFor = planOffset + currentTic - Math.ceil(speed/5);
-  return { attackType: currentAction, type, amount, plannedFor, plannedAt: currentTic };
+  const plannedFor = planOffset + currentTic - Math.ceil(speed / 5);
+  return {
+    attackType: currentAction,
+    type,
+    amount,
+    plannedFor,
+    plannedAt: currentTic,
+  };
 };
 
 const getAIAction = (state, currentTic, id) => {
@@ -155,12 +161,13 @@ const reduceMoves = R.curry((ticMoves, currentTic, state) =>
     clearEffectiveMoves,
     disableDeadActors,
     planAIMoves(currentTic),
-    persistActors,
+    persistActors
   )(state)
 );
 
 // turn evaluates each tic for planned actions and executes them on time
 function turn(state, action) {
+  console.log('taking turn');
   const { tic: currentTic } = action;
   const ticMoves = R.filter(
     R.propSatisfies((tic) => tic === currentTic, 'plannedFor'),
